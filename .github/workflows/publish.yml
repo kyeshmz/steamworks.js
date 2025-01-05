@@ -121,6 +121,17 @@ jobs:
                   echo "- Dist directory:" && ls -R dist
 
             - name: Publish to npm
-              uses: JS-DevTools/npm-publish@v1
+              uses: JS-DevTools/npm-publish@v3
               with:
                   token: ${{ secrets.NPM_TOKEN }}
+                
+            - name: Create Release
+              id: create_release
+              uses: softprops/action-gh-release@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  name: Release v${{ steps.publish.outputs.version }}
+                  tag_name: v${{ steps.publish.outputs.version }}
+                  generate_release_notes: true
+                  draft: false
