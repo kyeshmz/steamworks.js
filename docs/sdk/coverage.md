@@ -7,8 +7,8 @@ This layer covers 999 flat API methods (interface and struct methods) from `Stea
 | Status | Methods | Meaning |
 |---|---|---|
 | Generated | 908 | Bound mechanically from steam_api.json and the bindgen types. |
-| Hand-written | 6 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
-| Not implemented yet | 17 | Expressible, but not written yet. |
+| Hand-written | 23 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
+| Not implemented yet | 0 | Expressible, but not written yet. |
 | Not available | 22 | Cannot be called safely from JavaScript, or the type is not in the public SDK. |
 | Not exposed | 46 | Interfaces that only exist to be implemented by C++ code, or plumbing init() already handles. |
 
@@ -18,34 +18,29 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 
 | Method | Reason |
 |---|---|
+| `ISteamMatchmakingServers.RequestInternetServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods; src/sdk/servers.rs passes Steam a native object that forwards to it. |
+| `ISteamMatchmakingServers.RequestLANServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
+| `ISteamMatchmakingServers.RequestFriendsServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
+| `ISteamMatchmakingServers.RequestFavoritesServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
+| `ISteamMatchmakingServers.RequestHistoryServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
+| `ISteamMatchmakingServers.RequestSpectatorServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
+| `ISteamMatchmakingServers.ReleaseRequest` | Checks the HServerListRequest against live requests and frees its response object. |
+| `ISteamMatchmakingServers.GetServerDetails` | Checks the HServerListRequest against live requests; returns a copy of the gameserveritem_t. |
+| `ISteamMatchmakingServers.CancelQuery` | Checks the HServerListRequest against live requests. |
+| `ISteamMatchmakingServers.RefreshQuery` | Checks the HServerListRequest against live requests. |
+| `ISteamMatchmakingServers.IsRefreshing` | Checks the HServerListRequest against live requests. |
+| `ISteamMatchmakingServers.GetServerCount` | Checks the HServerListRequest against live requests. |
+| `ISteamMatchmakingServers.RefreshServer` | Checks the HServerListRequest against live requests. |
+| `ISteamMatchmakingServers.PingServer` | Takes a JavaScript object with the ISteamMatchmakingPingResponse methods. |
+| `ISteamMatchmakingServers.PlayerDetails` | Takes a JavaScript object with the ISteamMatchmakingPlayersResponse methods. |
+| `ISteamMatchmakingServers.ServerRules` | Takes a JavaScript object with the ISteamMatchmakingRulesResponse methods. |
+| `ISteamMatchmakingServers.CancelServerQuery` | Checks the HServerQuery against running queries and frees its response object. |
 | `ISteamInput.EnableActionEventCallbacks` | Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump. |
 | `ISteamNetworkingMessages.ReceiveMessagesOnChannel` | Returns copies of the received messages and releases the native ones. |
 | `ISteamNetworkingSockets.SendMessages` | Takes message descriptions and allocates the native messages itself. |
 | `ISteamNetworkingSockets.ReceiveMessagesOnConnection` | Returns copies of the received messages and releases the native ones. |
 | `ISteamNetworkingSockets.ReceiveMessagesOnPollGroup` | Returns copies of the received messages and releases the native ones. |
 | `ISteamNetworkingUtils.SetConfigValue` | pArg points to an int32, int64, float, string or pointer depending on eDataType. |
-
-## Not implemented yet
-
-| Method | Reason |
-|---|---|
-| `ISteamMatchmakingServers.RequestInternetServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RequestLANServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RequestFriendsServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RequestFavoritesServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RequestHistoryServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RequestSpectatorServerList` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.ReleaseRequest` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.GetServerDetails` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.CancelQuery` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RefreshQuery` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.IsRefreshing` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.GetServerCount` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.RefreshServer` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.PingServer` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.PlayerDetails` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.ServerRules` | Server browser requests report results through native response objects. Not implemented yet. |
-| `ISteamMatchmakingServers.CancelServerQuery` | Server browser requests report results through native response objects. Not implemented yet. |
 
 ## Not available
 
@@ -79,8 +74,8 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 | Interface | Reason |
 |---|---|
 | `ISteamClient` | Creates pipes, users and raw interface pointers. init() and the accessors below already do this, and steam_api.json declares no flat accessor for it. |
-| `ISteamMatchmakingServerListResponse` | An interface your game implements to receive results. Pass a handler object to the matchmaking servers calls instead. |
-| `ISteamMatchmakingPingResponse` | An interface your game implements to receive results. Pass a handler object to PingServer instead. |
-| `ISteamMatchmakingPlayersResponse` | An interface your game implements to receive results. Pass a handler object to PlayerDetails instead. |
-| `ISteamMatchmakingRulesResponse` | An interface your game implements to receive results. Pass a handler object to ServerRules instead. |
+| `ISteamMatchmakingServerListResponse` | An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.Request*ServerList. |
+| `ISteamMatchmakingPingResponse` | An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.PingServer. |
+| `ISteamMatchmakingPlayersResponse` | An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.PlayerDetails. |
+| `ISteamMatchmakingRulesResponse` | An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.ServerRules. |
 

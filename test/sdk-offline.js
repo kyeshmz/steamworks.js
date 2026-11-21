@@ -164,7 +164,7 @@ test('calls that need Steam fail cleanly before init()', () => {
 })
 
 test('unavailable methods explain why', () => {
-    throwsSdk(() => sdk.SteamMatchmakingServers.RequestLANServerList(480), /not available from JavaScript: Server browser/)
+    throwsSdk(() => sdk.SteamNetworkingUtils.SetGlobalCallback_SteamNetConnectionStatusChanged(), /sdk\.on\('SteamNetConnectionStatusChangedCallback_t'\)/)
     throwsSdk(() => sdk.SteamNetworkingSockets.ConnectP2PCustomSignaling(), /ISteamNetworkingConnectionSignaling/)
     throwsSdk(() => sdk.SteamNetworkingUtils.AllocateMessage(16), /SendMessages allocates messages/)
 })
@@ -325,6 +325,52 @@ async function dispatchTests() {
             fake.sdkCall = saved
             assert.deepEqual(calls, [[true], [false]])
             assert.deepEqual(seen, [1])
+        })
+
+        test('server browser responses reach the handler object', () => {
+            // Struct constructors call through sdkCall too: build these first.
+            const filter = new sdk.MatchMakingKeyValuePair_t()
+            filter.m_szKey = 'gamedir'
+            filter.m_szValue = 'spacewar'
+            const item = new sdk.gameserveritem_t()
+            item.m_nPing = 42
+            const saved = fake.sdkCall
+            const calls = []
+            fake.sdkCall = (index, accessor, args) => {
+                calls.push(args)
+                if (calls.length === 1) return [123n, 7] // RequestInternetServerList -> [hRequest, token]
+                if (calls.length === 2) return [5, 9] // PingServer -> [hServerQuery, token]
+                return undefined
+            }
+            const event = (token, method, hRequest, arg, extras = []) => {
+                const data = Buffer.alloc(24)
+                data.writeUInt32LE(token, 0)
+                data.writeUInt32LE(method, 4)
+                data.writeBigUInt64LE(hRequest, 8)
+                data.writeInt32LE(arg, 16)
+                return [0, 0, -2, null, false, data, extras]
+            }
+            const seen = []
+            const h = sdk.SteamMatchmakingServers.RequestInternetServerList(480, [filter], 1, {
+                ServerResponded(hRequest, iServer) { seen.push(['responded', hRequest, iServer]) },
+                RefreshComplete(hRequest, response) { seen.push(['complete', hRequest, response]) },
+            })
+            assert.equal(h, 123n)
+            assert.equal(calls[0][0], 480)
+            assert.equal(new sdk.MatchMakingKeyValuePair_t(calls[0][1][0]).m_szValue, 'spacewar')
+            const q = sdk.SteamMatchmakingServers.PingServer(0x7f000001, 27015, {
+                ServerResponded(server) { seen.push(['ping', server instanceof sdk.gameserveritem_t, server.m_nPing]) },
+            })
+            assert.equal(q, 5)
+            queue.push(event(7, 0, 123n, 2), event(7, 1, 123n, 3), event(7, 2, 123n, 0))
+            queue.push(event(9, 0, 0n, 0, [Buffer.from(item.buffer)]), event(9, 1, 0n, 0))
+            runtime.pump()
+            sdk.SteamMatchmakingServers.ReleaseRequest(123n)
+            queue.push(event(7, 0, 123n, 4))
+            runtime.pump()
+            fake.sdkCall = saved
+            assert.deepEqual(seen, [['responded', 123n, 2], ['complete', 123n, 0], ['ping', true, 42]])
+            assert.deepEqual(calls.at(-1), [123n])
         })
 
         await testAsync('reset rejects pending call results', async () => {

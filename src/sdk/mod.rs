@@ -12,6 +12,7 @@ pub mod extra;
 #[rustfmt::skip]
 mod generated;
 mod manual;
+mod servers;
 
 use napi::bindgen_prelude::BigInt;
 use napi::{sys as nsys, Env, Error, JsObject, JsUnknown, NapiRaw, Result};
@@ -104,17 +105,23 @@ fn observe(pipe: Pipe, id: i32, data: *const c_void, size: usize) {
 /// Queue an event that did not come through the callback dispatcher (for
 /// example SteamInputActionEvent_t, which Steam passes to a function pointer).
 pub(crate) fn push_callback(pipe: Pipe, id: i32, data: Vec<u8>) {
+    push_callback_with_extras(pipe, id, data, Vec::new());
+}
+
+pub(crate) fn push_callback_with_extras(pipe: Pipe, id: i32, data: Vec<u8>, extras: Vec<Extra>) {
     EVENTS.lock().unwrap().push(Event::Callback {
         pipe,
         id,
         data,
-        extras: Vec::new(),
+        extras,
     });
 }
 
 /// Called by `init()` once the client exists.
 pub(crate) fn attach_client(client: &steamworks::Client) {
     EVENTS.lock().unwrap().clear();
+    // The previous client (if any) was shut down; Steam holds no response objects.
+    servers::clear();
     client.set_raw_callback_observer(Some(Box::new(|id, data, size| {
         observe(Pipe::Client, id, data, size)
     })));
@@ -243,6 +250,7 @@ pub fn sdk_watch_call_result(handle: BigInt, server: bool) -> Result<()> {
 /// kind 0 = callback, 1 = call result; pipe 0 = client, 1 = game server.
 #[napi(js_name = "sdkTakeEvents", skip_typescript)]
 pub fn sdk_take_events(env: Env) -> Result<JsUnknown> {
+    servers::collect_finished();
     let events = std::mem::take(&mut *EVENTS.lock().unwrap());
     let mut out = env.create_array_with_length(events.len())?;
     for (i, event) in events.into_iter().enumerate() {

@@ -23,7 +23,7 @@ that this package links against, so it cannot drift from the binary.
 | ISteamMatchmakingPingResponse | — | 2 | not exposed |
 | ISteamMatchmakingPlayersResponse | — | 3 | not exposed |
 | ISteamMatchmakingRulesResponse | — | 3 | not exposed |
-| [ISteamMatchmakingServers](interfaces/ISteamMatchmakingServers.md) | `SteamMatchmakingServers` | 17 | 0/17 |
+| [ISteamMatchmakingServers](interfaces/ISteamMatchmakingServers.md) | `SteamMatchmakingServers` | 17 | 17/17 |
 | [ISteamGameSearch](interfaces/ISteamGameSearch.md) | `SteamGameSearch` | 14 | 14/14 |
 | [ISteamParties](interfaces/ISteamParties.md) | `SteamParties` | 12 | 12/12 |
 | [ISteamRemoteStorage](interfaces/ISteamRemoteStorage.md) | `SteamRemoteStorage` | 59 | 59/59 |
@@ -50,7 +50,7 @@ that this package links against, so it cannot drift from the binary.
 | [ISteamGameServerStats](interfaces/ISteamGameServerStats.md) | `SteamGameServerStats` | 10 | 10/10 |
 | [ISteamNetworkingFakeUDPPort](interfaces/ISteamNetworkingFakeUDPPort.md) | — | 4 | 3/4 |
 
-Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 22 not available, 17 not implemented yet, 6 hand-written.
+Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 22 not available, 23 hand-written.
 See [coverage](coverage.md) for every method that is not generated and why.
 
 - [Callbacks](callbacks.md): every callback and call result struct, with its id

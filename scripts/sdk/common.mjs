@@ -162,6 +162,74 @@ export const MANUAL_TS = {
         params: 'pCallback: ((event: SteamInputActionEvent_t) => void) | null',
         ret: 'void',
     },
+    SteamAPI_ISteamMatchmakingServers_RequestInternetServerList: {
+        params: 'iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_RequestFriendsServerList: {
+        params: 'iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_RequestFavoritesServerList: {
+        params: 'iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_RequestHistoryServerList: {
+        params: 'iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_RequestSpectatorServerList: {
+        params: 'iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_RequestLANServerList: {
+        params: 'iApp: number, pRequestServersResponse: ISteamMatchmakingServerListResponse',
+        ret: 'bigint',
+    },
+    SteamAPI_ISteamMatchmakingServers_ReleaseRequest: {
+        params: 'hServerListRequest: bigint',
+        ret: 'void',
+    },
+    SteamAPI_ISteamMatchmakingServers_GetServerDetails: {
+        params: 'hRequest: bigint, iServer: number',
+        ret: 'gameserveritem_t | null',
+    },
+    SteamAPI_ISteamMatchmakingServers_CancelQuery: {
+        params: 'hRequest: bigint',
+        ret: 'void',
+    },
+    SteamAPI_ISteamMatchmakingServers_RefreshQuery: {
+        params: 'hRequest: bigint',
+        ret: 'void',
+    },
+    SteamAPI_ISteamMatchmakingServers_IsRefreshing: {
+        params: 'hRequest: bigint',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamMatchmakingServers_GetServerCount: {
+        params: 'hRequest: bigint',
+        ret: 'number',
+    },
+    SteamAPI_ISteamMatchmakingServers_RefreshServer: {
+        params: 'hRequest: bigint, iServer: number',
+        ret: 'void',
+    },
+    SteamAPI_ISteamMatchmakingServers_PingServer: {
+        params: 'unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingPingResponse',
+        ret: 'number',
+    },
+    SteamAPI_ISteamMatchmakingServers_PlayerDetails: {
+        params: 'unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingPlayersResponse',
+        ret: 'number',
+    },
+    SteamAPI_ISteamMatchmakingServers_ServerRules: {
+        params: 'unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingRulesResponse',
+        ret: 'number',
+    },
+    SteamAPI_ISteamMatchmakingServers_CancelServerQuery: {
+        params: 'hServerQuery: number',
+        ret: 'void',
+    },
     SteamAPI_ISteamNetworkingUtils_SetConfigValue: {
         params: 'eValue: ESteamNetworkingConfigValue, eScopeType: ESteamNetworkingConfigScope, scopeObj: bigint | number, eDataType: ESteamNetworkingConfigDataType, pArg: number | bigint | string',
         ret: 'boolean',

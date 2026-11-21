@@ -257,10 +257,10 @@ export const paramPatterns = [
 // Whole interfaces that are not exposed, with the reason shown in the docs.
 export const interfaceExclusions = {
     ISteamClient: 'Creates pipes, users and raw interface pointers. init() and the accessors below already do this, and steam_api.json declares no flat accessor for it.',
-    ISteamMatchmakingServerListResponse: 'An interface your game implements to receive results. Pass a handler object to the matchmaking servers calls instead.',
-    ISteamMatchmakingPingResponse: 'An interface your game implements to receive results. Pass a handler object to PingServer instead.',
-    ISteamMatchmakingPlayersResponse: 'An interface your game implements to receive results. Pass a handler object to PlayerDetails instead.',
-    ISteamMatchmakingRulesResponse: 'An interface your game implements to receive results. Pass a handler object to ServerRules instead.',
+    ISteamMatchmakingServerListResponse: 'An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.Request*ServerList.',
+    ISteamMatchmakingPingResponse: 'An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.PingServer.',
+    ISteamMatchmakingPlayersResponse: 'An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.PlayerDetails.',
+    ISteamMatchmakingRulesResponse: 'An interface your game implements to receive results: pass an object with these methods to SteamMatchmakingServers.ServerRules.',
 }
 
 // Methods implemented by hand in src/sdk/manual.rs and lib/sdk/runtime.js.
@@ -273,6 +273,23 @@ export const manualMethods = {
     SteamAPI_ISteamNetworkingSockets_SendMessages: 'Takes message descriptions and allocates the native messages itself.',
     SteamAPI_ISteamNetworkingUtils_SetConfigValue: 'pArg points to an int32, int64, float, string or pointer depending on eDataType.',
     SteamAPI_ISteamInput_EnableActionEventCallbacks: 'Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump.',
+    SteamAPI_ISteamMatchmakingServers_RequestInternetServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods; src/sdk/servers.rs passes Steam a native object that forwards to it.',
+    SteamAPI_ISteamMatchmakingServers_RequestLANServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_RequestFriendsServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_RequestFavoritesServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_RequestHistoryServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_RequestSpectatorServerList: 'Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_ReleaseRequest: 'Checks the HServerListRequest against live requests and frees its response object.',
+    SteamAPI_ISteamMatchmakingServers_GetServerDetails: 'Checks the HServerListRequest against live requests; returns a copy of the gameserveritem_t.',
+    SteamAPI_ISteamMatchmakingServers_CancelQuery: 'Checks the HServerListRequest against live requests.',
+    SteamAPI_ISteamMatchmakingServers_RefreshQuery: 'Checks the HServerListRequest against live requests.',
+    SteamAPI_ISteamMatchmakingServers_IsRefreshing: 'Checks the HServerListRequest against live requests.',
+    SteamAPI_ISteamMatchmakingServers_GetServerCount: 'Checks the HServerListRequest against live requests.',
+    SteamAPI_ISteamMatchmakingServers_RefreshServer: 'Checks the HServerListRequest against live requests.',
+    SteamAPI_ISteamMatchmakingServers_PingServer: 'Takes a JavaScript object with the ISteamMatchmakingPingResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_PlayerDetails: 'Takes a JavaScript object with the ISteamMatchmakingPlayersResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_ServerRules: 'Takes a JavaScript object with the ISteamMatchmakingRulesResponse methods.',
+    SteamAPI_ISteamMatchmakingServers_CancelServerQuery: 'Checks the HServerQuery against running queries and frees its response object.',
 }
 
 // Methods that cannot be expressed from JavaScript, with the reason.
@@ -290,9 +307,5 @@ export const unsupportedMethods = {
     SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionFailed: 'Takes a native function pointer. Subscribe with sdk.on(\'SteamNetworkingMessagesSessionFailed_t\') instead.',
 }
 
-// ISteamMatchmakingServers needs native response objects (C++ vtables) for
-// its request calls; until those are implemented the whole interface is
-// listed as pending rather than half-exposed.
-export const pendingInterfaces = {
-    ISteamMatchmakingServers: 'Server browser requests report results through native response objects. Not implemented yet.',
-}
+// Interfaces that are expressible but not implemented yet, with the reason.
+export const pendingInterfaces = {}

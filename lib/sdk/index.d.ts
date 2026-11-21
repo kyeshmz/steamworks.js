@@ -64,6 +64,48 @@ export interface SteamNetworkingMessageCopy extends SteamNetworkingMessage_t {
     readonly data: Buffer
 }
 
+/**
+ * Pass an object with these methods to SteamMatchmakingServers.Request*ServerList.
+ * They are called from the callback pump; omit the ones you do not need.
+ * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ISteamMatchmakingServerListResponse
+ */
+export interface ISteamMatchmakingServerListResponse {
+    /** Server has responded ok with updated data. Read it with SteamMatchmakingServers.GetServerDetails(hRequest, iServer). */
+    ServerResponded?(hRequest: bigint, iServer: number): void
+    /** Server has failed to respond. */
+    ServerFailedToRespond?(hRequest: bigint, iServer: number): void
+    /** A list refresh you had initiated is now 100% completed. */
+    RefreshComplete?(hRequest: bigint, response: EMatchMakingServerResponse): void
+}
+
+/** Pass to SteamMatchmakingServers.PingServer. @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ISteamMatchmakingPingResponse */
+export interface ISteamMatchmakingPingResponse {
+    /** Server has responded successfully and has updated data. */
+    ServerResponded?(server: gameserveritem_t): void
+    /** Server failed to respond to the ping request. */
+    ServerFailedToRespond?(): void
+}
+
+/** Pass to SteamMatchmakingServers.PlayerDetails. @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ISteamMatchmakingPlayersResponse */
+export interface ISteamMatchmakingPlayersResponse {
+    /** Got data on a new player on the server. */
+    AddPlayerToList?(pchName: string | null, nScore: number, flTimePlayed: number): void
+    /** The server failed to respond to the request for player details. */
+    PlayersFailedToRespond?(): void
+    /** The server has finished responding to the player details request. */
+    PlayersRefreshComplete?(): void
+}
+
+/** Pass to SteamMatchmakingServers.ServerRules. @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ISteamMatchmakingRulesResponse */
+export interface ISteamMatchmakingRulesResponse {
+    /** Got data on a rule on the server. */
+    RulesResponded?(pchRule: string | null, pchValue: string | null): void
+    /** The server failed to respond to the request for rule details. */
+    RulesFailedToRespond?(): void
+    /** The server has finished responding to the rule details request. */
+    RulesRefreshComplete?(): void
+}
+
 /** One message for SteamNetworkingSockets.SendMessages. */
 export interface SteamNetworkingMessageToSend {
     data: Uint8Array | null
@@ -12759,8 +12801,6 @@ export declare const SteamMatchmaking: ISteamMatchmaking
 /**
  * Functions for match making services for clients to get to game lists and details
  *
- * **Not available yet:** Server browser requests report results through native response objects. Not implemented yet.
- *
  * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers
  */
 export interface ISteamMatchmakingServers {
@@ -12769,7 +12809,7 @@ export interface ISteamMatchmakingServers {
      * Each call allocates a new asynchronous request object.
      * Request object must be released by calling ReleaseRequest( hServerListRequest )
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods; src/sdk/servers.rs passes Steam a native object that forwards to it.
      *
      * @param iApp `AppId_t`
      * @param ppchFilters `MatchMakingKeyValuePair_t **`
@@ -12778,18 +12818,18 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerListRequest RequestInternetServerList( AppId_t iApp, MatchMakingKeyValuePair_t ** ppchFilters, uint32 nFilters, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestInternetServerList
      */
-    RequestInternetServerList(...args: never[]): never
+    RequestInternetServerList(iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.
      *
      * @param iApp `AppId_t`
      * @param pRequestServersResponse `ISteamMatchmakingServerListResponse *`
      * C++: `HServerListRequest RequestLANServerList( AppId_t iApp, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestLANServerList
      */
-    RequestLANServerList(...args: never[]): never
+    RequestLANServerList(iApp: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.
      *
      * @param iApp `AppId_t`
      * @param ppchFilters `MatchMakingKeyValuePair_t **`
@@ -12798,9 +12838,9 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerListRequest RequestFriendsServerList( AppId_t iApp, MatchMakingKeyValuePair_t ** ppchFilters, uint32 nFilters, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestFriendsServerList
      */
-    RequestFriendsServerList(...args: never[]): never
+    RequestFriendsServerList(iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.
      *
      * @param iApp `AppId_t`
      * @param ppchFilters `MatchMakingKeyValuePair_t **`
@@ -12809,9 +12849,9 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerListRequest RequestFavoritesServerList( AppId_t iApp, MatchMakingKeyValuePair_t ** ppchFilters, uint32 nFilters, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestFavoritesServerList
      */
-    RequestFavoritesServerList(...args: never[]): never
+    RequestFavoritesServerList(iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.
      *
      * @param iApp `AppId_t`
      * @param ppchFilters `MatchMakingKeyValuePair_t **`
@@ -12820,9 +12860,9 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerListRequest RequestHistoryServerList( AppId_t iApp, MatchMakingKeyValuePair_t ** ppchFilters, uint32 nFilters, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestHistoryServerList
      */
-    RequestHistoryServerList(...args: never[]): never
+    RequestHistoryServerList(iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods.
      *
      * @param iApp `AppId_t`
      * @param ppchFilters `MatchMakingKeyValuePair_t **`
@@ -12831,31 +12871,31 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerListRequest RequestSpectatorServerList( AppId_t iApp, MatchMakingKeyValuePair_t ** ppchFilters, uint32 nFilters, ISteamMatchmakingServerListResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RequestSpectatorServerList
      */
-    RequestSpectatorServerList(...args: never[]): never
+    RequestSpectatorServerList(iApp: number, ppchFilters: readonly MatchMakingKeyValuePair_t[] | null, nFilters: number, pRequestServersResponse: ISteamMatchmakingServerListResponse): bigint
     /**
      * Releases the asynchronous request object and cancels any pending query on it if there's a pending query in progress.
      * RefreshComplete callback is not posted when request is released.
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests and frees its response object.
      *
      * @param hServerListRequest `HServerListRequest`
      * C++: `void ReleaseRequest( HServerListRequest hServerListRequest )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ReleaseRequest
      */
-    ReleaseRequest(...args: never[]): never
+    ReleaseRequest(hServerListRequest: bigint): void
     /**
      * Get details on a given server in the list, you can get the valid range of index
      * values by calling GetServerCount().  You will also receive index values in
      * ISteamMatchmakingServerListResponse::ServerResponded() callbacks
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests; returns a copy of the gameserveritem_t.
      *
      * @param hRequest `HServerListRequest`
      * @param iServer `int`
      * C++: `gameserveritem_t * GetServerDetails( HServerListRequest hRequest, int iServer )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#GetServerDetails
      */
-    GetServerDetails(...args: never[]): never
+    GetServerDetails(hRequest: bigint, iServer: number): gameserveritem_t | null
     /**
      * Cancel an request which is operation on the given list type.  You should call this to cancel
      * any in-progress requests before destructing a callback object that may have been passed
@@ -12864,13 +12904,13 @@ export interface ISteamMatchmakingServers {
      * Canceling a query does not release the allocated request handle.
      * The request handle must be released using ReleaseRequest( hRequest )
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests.
      *
      * @param hRequest `HServerListRequest`
      * C++: `void CancelQuery( HServerListRequest hRequest )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#CancelQuery
      */
-    CancelQuery(...args: never[]): never
+    CancelQuery(hRequest: bigint): void
     /**
      * Ping every server in your list again but don't update the list of servers
      * Query callback installed when the server list was requested will be used
@@ -12878,48 +12918,48 @@ export interface ISteamMatchmakingServers {
      * valid until another RefreshComplete is called on it or the request
      * is released with ReleaseRequest( hRequest )
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests.
      *
      * @param hRequest `HServerListRequest`
      * C++: `void RefreshQuery( HServerListRequest hRequest )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RefreshQuery
      */
-    RefreshQuery(...args: never[]): never
+    RefreshQuery(hRequest: bigint): void
     /**
      * Returns true if the list is currently refreshing its server list
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests.
      *
      * @param hRequest `HServerListRequest`
      * C++: `bool IsRefreshing( HServerListRequest hRequest )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#IsRefreshing
      */
-    IsRefreshing(...args: never[]): never
+    IsRefreshing(hRequest: bigint): boolean
     /**
      * How many servers in the given list, GetServerDetails above takes 0... GetServerCount() - 1
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests.
      *
      * @param hRequest `HServerListRequest`
      * C++: `int GetServerCount( HServerListRequest hRequest )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#GetServerCount
      */
-    GetServerCount(...args: never[]): never
+    GetServerCount(hRequest: bigint): number
     /**
      * Refresh a single server inside of a query (rather than all the servers )
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerListRequest against live requests.
      *
      * @param hRequest `HServerListRequest`
      * @param iServer `int`
      * C++: `void RefreshServer( HServerListRequest hRequest, int iServer )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#RefreshServer
      */
-    RefreshServer(...args: never[]): never
+    RefreshServer(hRequest: bigint, iServer: number): void
     /**
      * Request updated ping time and other details from a single server
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingPingResponse methods.
      *
      * @param unIP `uint32`
      * @param usPort `uint16`
@@ -12927,11 +12967,11 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerQuery PingServer( uint32 unIP, uint16 usPort, ISteamMatchmakingPingResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#PingServer
      */
-    PingServer(...args: never[]): never
+    PingServer(unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingPingResponse): number
     /**
      * Request the list of players currently playing on a server
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingPlayersResponse methods.
      *
      * @param unIP `uint32`
      * @param usPort `uint16`
@@ -12939,11 +12979,11 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerQuery PlayerDetails( uint32 unIP, uint16 usPort, ISteamMatchmakingPlayersResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#PlayerDetails
      */
-    PlayerDetails(...args: never[]): never
+    PlayerDetails(unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingPlayersResponse): number
     /**
      * Request the list of rules that the server is running (See ISteamGameServer::SetKeyValue() to set the rules server side)
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Takes a JavaScript object with the ISteamMatchmakingRulesResponse methods.
      *
      * @param unIP `uint32`
      * @param usPort `uint16`
@@ -12951,19 +12991,19 @@ export interface ISteamMatchmakingServers {
      * C++: `HServerQuery ServerRules( uint32 unIP, uint16 usPort, ISteamMatchmakingRulesResponse * pRequestServersResponse )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#ServerRules
      */
-    ServerRules(...args: never[]): never
+    ServerRules(unIP: number, usPort: number, pRequestServersResponse: ISteamMatchmakingRulesResponse): number
     /**
      * Cancel an outstanding Ping/Players/Rules query from above.  You should call this to cancel
      * any in-progress requests before destructing a callback object that may have been passed
      * to one of the above calls to avoid crashing when callbacks occur.
      *
-     * **Not available from JavaScript:** Server browser requests report results through native response objects. Not implemented yet.
+     * Hand-written binding: Checks the HServerQuery against running queries and frees its response object.
      *
      * @param hServerQuery `HServerQuery`
      * C++: `void CancelServerQuery( HServerQuery hServerQuery )`
      * @see https://partner.steamgames.com/doc/api/ISteamMatchmakingServers#CancelServerQuery
      */
-    CancelServerQuery(...args: never[]): never
+    CancelServerQuery(hServerQuery: number): void
 }
 
 /**

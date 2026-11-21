@@ -257,6 +257,39 @@ steamworks.shutdownGameServer()
 A dedicated server can call `initGameServer` without `init()`. A listen server can call both.
 Call results from game-server interfaces resolve through the game server's pipe automatically.
 
+## Server browser
+
+`ISteamMatchmakingServers` reports results by calling methods on an object the game
+implements. Pass a JavaScript object with the methods you need, named as in the C++
+response interfaces. They are called from the callback pump.
+
+```js
+const filter = new sdk.MatchMakingKeyValuePair_t()
+filter.m_szKey = 'gamedir'
+filter.m_szValue = 'spacewar'
+
+const hRequest = sdk.SteamMatchmakingServers.RequestInternetServerList(480, [filter], 1, {
+    ServerResponded(hRequest, iServer) {
+        const server = sdk.SteamMatchmakingServers.GetServerDetails(hRequest, iServer)
+        console.log(server.GetName(), server.m_nPlayers, server.m_nPing)
+    },
+    RefreshComplete(hRequest, response) {
+        sdk.SteamMatchmakingServers.ReleaseRequest(hRequest)
+    },
+})
+
+sdk.SteamMatchmakingServers.ServerRules(ip, queryPort, {
+    RulesResponded(pchRule, pchValue) { console.log(pchRule, '=', pchValue) },
+    RulesRefreshComplete() {},
+})
+```
+
+Release every list request with `ReleaseRequest`, as in C++. The response object stays
+referenced until then. `HServerListRequest` values are opaque `bigint`s; the native side
+checks them against the requests it created, so a released or made-up handle throws instead
+of reaching Steam. A ping, player or rules query ends at its last response, or when you call
+`CancelServerQuery`.
+
 ## What is not available
 
 The [coverage page](../sdk/coverage.md) lists every method that is not generated, with the
@@ -280,10 +313,9 @@ reason. In short:
   implement (custom signaling, the global networking callbacks), or that return raw native
   objects. Most have an equivalent through `sdk.on(...)`, and the
   reason text says which.
-- **Not implemented yet.** `ISteamMatchmakingServers` (the server browser), which reports
-  results through C++ response objects.
-- **Not exposed.** `ISteamClient` (pipe and user plumbing that `init()` handles) and the
-  `ISteam*Response` interfaces that only exist for C++ code to implement.
+- **Not exposed.** `ISteamClient`, the pipe and user plumbing that `init()` handles. The
+  `ISteamMatchmaking*Response` interfaces aren't exposed either: you implement them as plain
+  objects (see [Server browser](#server-browser)).
 
 Calling an unavailable method throws `SteamSdkError` with the reason.
 
