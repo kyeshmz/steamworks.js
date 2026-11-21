@@ -14,10 +14,11 @@ Use `const client = require('@kyeshmz/steamworks.js').init(appId)` in the main p
 | Overlay and screenshots | Query overlay availability, subscribe to activation changes, place notifications, trigger captures and import JPEGs. |
 | Apps and DLC | Read launch parameters, list DLC, request installation or removal, and check download progress. |
 | Inventory | Load definition IDs and properties, and send a playtime heartbeat. Owned item balances, trading, purchases and signed proofs are not exposed. |
+| Everything else | `client.sdk` exposes the whole SDK under its C++ names, including inventory results, trading, Networking Sockets, HTML surfaces, game servers and timeline. See the [SDK layer guide](guide/sdk.md) and its [coverage page](sdk/coverage.md). |
 
 ## What the checks prove
 
-`test/package-smoke.js` loads the built addon and checks native argument validation without a Steam account. `test/typescript` compiles a consumer against the declarations. The release workflow runs package checks on Linux x64, Windows x64, and both Mac architectures.
+`test/package-smoke.js` loads the built addon and checks native argument validation without a Steam account. `test/sdk-offline.js` does the same for the SDK layer, and also checks struct layouts and callback dispatch. `test/typescript` compiles a consumer against the declarations. The release workflow runs package checks on Linux x64, Windows x64, and both Mac architectures.
 
 Use `node test/steam-readonly.js 480` with a signed-in Steam client to check reads. `test/inventory-definitions.js` needs an App ID and a known item definition. Overlay rendering, physical input, two-account networking and writes to Steam need separate live tests.
 

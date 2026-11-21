@@ -11,6 +11,21 @@ The [fork and issue audit](docs/coverage/README.md) compares implementations and
 
 A modern implementation of the Steamworks SDK for HTML/JS and NodeJS based applications.
 
+This fork has two APIs:
+
+- **High-level API:** `client.achievement`, `client.matchmaking`, `client.workshop` and the
+  other namespaces from upstream, plus the features listed in the [fork feature guide](docs/fork-features.md).
+- **1:1 SDK layer** (`client.sdk`): the whole Steamworks SDK under its C++ names, generated from
+  Valve's `steam_api.json`.
+  - **Coverage:** every interface, struct, callback, enum and constant. 913 of the 953 methods
+    on exposed interfaces and structs are callable: 908 generated and 5 hand-written. The other
+    46 flat methods belong to `ISteamClient` and the C++ response interfaces, which are not
+    exposed. The [coverage page](docs/sdk/coverage.md) gives the reason for each method that is
+    not callable.
+  - **Documentation:** one reference page per interface, with Valve's header comments.
+
+Start with the [documentation index](docs/README.md).
+
 ## Why
 
 I used [greenworks](https://github.com/greenheartgames/greenworks) for a long time and it's great, but I gave up for the following reasons.
@@ -41,7 +56,29 @@ if (client.achievement.activate('ACHIEVEMENT')) {
 }
 ```
 
-See the [TypeScript declarations](client.d.ts) for supported calls and their signatures.
+See the [high-level API reference](docs/guide/high-level-api.md) and the [TypeScript declarations](client.d.ts).
+
+The same things through the SDK layer, with Valve's names and semantics:
+
+```js
+const { sdk } = client
+
+console.log(sdk.SteamFriends.GetPersonaName())
+
+if (sdk.SteamUserStats.SetAchievement('ACHIEVEMENT')) {
+    sdk.SteamUserStats.StoreStats()
+}
+
+// Outputs come back in a result object; call results are Promises.
+const { result, pData } = sdk.SteamUserStats.GetStatInt32('NumGames')
+const board = await sdk.SteamUserStats.FindLeaderboard('Feet Traveled')
+
+sdk.on('GameOverlayActivated_t', (event) => console.log('overlay active:', event.m_bActive))
+```
+
+Read [the SDK layer guide](docs/guide/sdk.md) for how C++ types, out parameters, buffers,
+structs, call results and callbacks map to JavaScript. Every method is in the
+[generated reference](docs/sdk/README.md).
 
 ## Installation
 
@@ -71,6 +108,8 @@ For the production build, copy the relevant distro files from `sdk/redistributab
 Make sure you have the latest [node.js](https://nodejs.org/en/), [Rust](https://www.rust-lang.org/tools/install) and [Clang](https://rust-lang.github.io/rust-bindgen/requirements.html). We also need [Steam](https://store.steampowered.com/about/) installed and running.
 
 From the repository root, run `corepack enable`, `pnpm install --frozen-lockfile`, and `pnpm run build:debug` to build the library.
+
+Run `pnpm run test:sdk` to check the SDK layer without Steam, and `node test/sdk-readonly.js 480` with a signed-in Steam client. The SDK layer's Rust, JavaScript, declarations and reference docs are generated: after changing the generator or updating steamworks-rs, run `pnpm run generate`. See [maintaining the SDK layer](docs/guide/maintaining.md).
 
 CI builds for Linux x64, Windows x64, and both macOS architectures.
 
