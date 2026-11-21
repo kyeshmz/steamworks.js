@@ -1,0 +1,31 @@
+[package]
+name = "steamworks"
+version = "0.11.0"
+authors = ["Thinkofname"]
+description = "Provides rust friendly bindings to the steamworks sdk"
+license = "MIT / Apache-2.0"
+repository = "https://github.com/Noxime/steamworks-rs"
+documentation = "https://docs.rs/steamworks"
+keywords = ["steam", "gamedev"]
+categories = ["games"]
+edition = "2021"
+rust-version = "1.71.1"
+
+# Vendored from https://github.com/Noxime/steamworks-rs at
+# fbb79635b06b4feea8261e5ca3e8ea3ef42facf9 with the patch described in
+# PATCHES.md. steamworks-sys (bindings + SDK redistributables) is still
+# fetched from that exact upstream revision.
+
+[features]
+default = []
+raw-bindings = []
+image = ["dep:image"]
+
+[dependencies]
+steamworks-sys = { git = "https://github.com/Noxime/steamworks-rs/", rev = "fbb79635b06b4feea8261e5ca3e8ea3ef42facf9" }
+thiserror = "1.0"
+bitflags = "1.2"
+lazy_static = "1.4"
+serde = { version = "1.0", features = ["derive"], optional = true }
+paste = "1.0.11"
+image = { version = "0.25.1", optional = true, default-features = false }

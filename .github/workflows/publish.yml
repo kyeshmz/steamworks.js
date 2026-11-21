@@ -31,6 +31,9 @@ jobs:
             - name: Clippy
               run: cargo clippy
 
+            - name: Generated SDK layer is up to date
+              run: node scripts/sdk/generate.mjs --check
+
     build:
         runs-on: ubuntu-latest
 
@@ -69,6 +72,9 @@ jobs:
                   pnpm run build --target x86_64-unknown-linux-gnu
                   test -s client.d.ts && test -s index.d.ts
 
+            - name: SDK layer offline checks
+              run: node test/sdk-offline.js
+
             - uses: actions/upload-artifact@v4
               with:
                   name: declarations
@@ -94,6 +100,7 @@ jobs:
             - uses: Swatinem/rust-cache@v2
             - run: pnpm install --frozen-lockfile
             - run: pnpm run build --target x86_64-pc-windows-msvc
+            - run: node test/sdk-offline.js
             - uses: actions/upload-artifact@v4
               with:
                   name: binaries-windows
@@ -129,6 +136,9 @@ jobs:
             - name: Build Mac arm64
               run: pnpm run build --target aarch64-apple-darwin
 
+            - name: SDK layer offline checks (x64)
+              run: node test/sdk-offline.js
+
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
@@ -162,12 +172,14 @@ jobs:
                   tar -xzf "$RUNNER_TEMP"/*.tgz -C "$RUNNER_TEMP/packed"
                   cd "$RUNNER_TEMP/packed/package"
                   for file in CHANGELOG.md index.js index.d.ts client.d.ts callbacks.d.ts \
+                    lib/sdk/{index.js,runtime.js,generated.js,index.d.ts} \
                     dist/linux64/{steamworksjs.linux-x64-gnu.node,libsteam_api.so} \
                     dist/win64/{steamworksjs.win32-x64-msvc.node,steam_api64.dll} \
                     dist/osx/{steamworksjs.darwin-x64.node,steamworksjs.darwin-arm64.node,libsteam_api.dylib}; do
                       test -s "$file" || { echo "Missing $file"; exit 1; }
                   done
                   node "$GITHUB_WORKSPACE/test/package-smoke.js" "$PWD"
+                  node "$GITHUB_WORKSPACE/test/sdk-offline.js" "$PWD"
                   mkdir "$RUNNER_TEMP/consumer"
                   cd "$RUNNER_TEMP/consumer"
                   echo '{"private":true}' > package.json
@@ -198,6 +210,7 @@ jobs:
               run: |
                   tar -xzf ./*.tgz
                   node test/package-smoke.js package
+                  node test/sdk-offline.js package
 
     release:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

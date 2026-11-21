@@ -26,6 +26,7 @@ pub fn init(app_id: Option<u32>) -> Result<(), Error> {
 
     steam_client.user_stats().request_current_stats();
 
+    sdk::attach_client(&steam_client);
     client::set_client(steam_client);
     Ok(())
 }
@@ -37,7 +38,11 @@ pub fn restart_app_if_necessary(app_id: u32) -> bool {
 
 #[napi]
 pub fn run_callbacks() {
-    client::get_client().run_callbacks();
+    if client::has_client() {
+        client::get_client().run_callbacks();
+    }
+    sdk::run_server_callbacks();
 }
 
 pub mod api;
+pub mod sdk;
