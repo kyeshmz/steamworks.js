@@ -11,6 +11,7 @@ pub mod extra;
 // Formatting is the generator's job; `cargo fmt` would make `--check` fail.
 #[rustfmt::skip]
 mod generated;
+mod hooks;
 mod manual;
 mod servers;
 
@@ -84,6 +85,15 @@ lazy_static! {
     static ref GAME_SERVER: Mutex<Option<GameServer>> = Mutex::new(None);
     static ref EVENTS: Mutex<Vec<Event>> = Mutex::new(Vec::new());
     static ref SUBSCRIBED: Mutex<HashSet<i32>> = Mutex::new(HashSet::new());
+    /// Native objects handed to JavaScript as handles (ISteamNetworkingFakeUDPPort).
+    static ref OBJECTS: Mutex<HashSet<usize>> = Mutex::new(HashSet::new());
+}
+
+/// Interfaces reached through an object a method returned, not an accessor.
+const OBJECT_INTERFACES: &[&str] = &["ISteamNetworkingFakeUDPPort"];
+
+pub(crate) fn register_object(p: *mut c_void) {
+    OBJECTS.lock().unwrap().insert(p as usize);
 }
 
 fn observe(pipe: Pipe, id: i32, data: *const c_void, size: usize) {
@@ -122,6 +132,7 @@ pub(crate) fn attach_client(client: &steamworks::Client) {
     EVENTS.lock().unwrap().clear();
     // The previous client (if any) was shut down; Steam holds no response objects.
     servers::clear();
+    OBJECTS.lock().unwrap().clear();
     client.set_raw_callback_observer(Some(Box::new(|id, data, size| {
         observe(Pipe::Client, id, data, size)
     })));
@@ -222,6 +233,45 @@ pub fn sdk_call(env: Env, method: u32, accessor: u32, args: JsObject) -> Result<
         (iface, pipe)
     };
     unsafe { generated::call(&env, method, iface, pipe, &args) }
+}
+
+/// Call a method of an interface obtained from another call (`handle` is the
+/// object pointer that call returned, checked against live objects).
+#[napi(js_name = "sdkCallOn", skip_typescript)]
+pub fn sdk_call_on(env: Env, method: u32, handle: BigInt, args: JsObject) -> Result<JsUnknown> {
+    let info = generated::METHODS
+        .get(method as usize)
+        .ok_or_else(|| Error::from_reason(format!("unknown SDK method #{method}")))?;
+    let interface = generated::INTERFACE_NAMES
+        .get(info.interface as usize)
+        .copied()
+        .unwrap_or("");
+    if !OBJECT_INTERFACES.contains(&interface) {
+        return Err(Error::from_reason(format!(
+            "{} is not called through an object",
+            info.name
+        )));
+    }
+    let (signed, value, lossless) = handle.get_u64();
+    let key = value as usize;
+    if signed || !lossless || !OBJECTS.lock().unwrap().contains(&key) {
+        return Err(Error::from_reason(format!(
+            "{}: the {interface} object was destroyed or never existed",
+            info.name
+        )));
+    }
+    if !pipe_ready(Pipe::Global) {
+        return Err(Error::from_reason(format!(
+            "{} needs init() first",
+            info.name
+        )));
+    }
+    let args = Args::new(&env, &args, info.name)?;
+    let result = unsafe { generated::call(&env, method, key as *mut c_void, Pipe::Client, &args) };
+    if info.name.ends_with("_DestroyFakeUDPPort") {
+        OBJECTS.lock().unwrap().remove(&key);
+    }
+    result
 }
 
 /// Start or stop copying callbacks with this id into the event queue.

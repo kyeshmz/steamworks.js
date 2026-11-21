@@ -306,13 +306,27 @@ reason. In short:
     itself.
   - **`SteamNetworkingUtils.SetConfigValue(...)`** takes the value as a number, bigint or
     string, according to `eDataType`.
-  - **`SteamInput.EnableActionEventCallbacks(handler)`** takes a function, or `null` to turn it
-    off, where C++ takes a function pointer. Steam calls a native function that queues each
-    `SteamInputActionEvent_t`, and your handler receives it on the next callback pump.
-- **Not available.** Methods that take native function pointers or C++ objects you would
-  implement (custom signaling, the global networking callbacks), or that return raw native
-  objects. Most have an equivalent through `sdk.on(...)`, and the
-  reason text says which.
+  - **Methods that take a function pointer in C++ take a JavaScript function** (or `null` to
+    remove it). This covers:
+    - `SteamInput.EnableActionEventCallbacks`
+    - `SteamUtils.SetWarningMessageHook`
+    - `SteamNetworkingUtils.SetDebugOutputFunction`
+    - the six `SteamNetworkingUtils.SetGlobalCallback_*` methods
+
+    Steam calls a native function that queues the event, and your function runs on the next
+    callback pump, on the main thread. This holds even when Steam produces the event on one
+    of its own threads.
+  - **`SteamNetworkingSockets.CreateFakeUDPPort(idx)`** returns an object with the
+    `ISteamNetworkingFakeUDPPort` methods (`SendMessageToFakeIP`, `ReceiveMessages`,
+    `ScheduleCleanup`, `DestroyFakeUDPPort`), or `null`. After `DestroyFakeUDPPort` the
+    object's methods throw.
+- **Not available.** Only 12 methods:
+  - **Custom signaling:** the custom-signaling calls need a C++ object you implement.
+  - **Raw native pointers:** `AllocateMessage`, `SteamNetworkingMessage_t::Release`,
+    `SetGlobalConfigValuePtr` and the `SetPtr`/`SetString` struct methods deal in raw
+    pointers.
+  - **Types missing from the public SDK:** five calls use structs that it doesn't define
+    (`SteamDatagramHostedAddress`, `SteamDatagramGameCoordinatorServerLogin`).
 - **Not exposed.** `ISteamClient`, the pipe and user plumbing that `init()` handles. The
   `ISteamMatchmaking*Response` interfaces aren't exposed either: you implement them as plain
   objects (see [Server browser](#server-browser)).

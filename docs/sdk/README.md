@@ -17,7 +17,7 @@ that this package links against, so it cannot drift from the binary.
 | ISteamClient | — | 35 | not exposed |
 | [ISteamUser](interfaces/ISteamUser.md) | `SteamUser` | 33 | 33/33 |
 | [ISteamFriends](interfaces/ISteamFriends.md) | `SteamFriends` | 80 | 80/80 |
-| [ISteamUtils](interfaces/ISteamUtils.md) | `SteamUtils`, `SteamGameServerUtils` | 37 | 36/37 |
+| [ISteamUtils](interfaces/ISteamUtils.md) | `SteamUtils`, `SteamGameServerUtils` | 37 | 37/37 |
 | [ISteamMatchmaking](interfaces/ISteamMatchmaking.md) | `SteamMatchmaking` | 38 | 38/38 |
 | ISteamMatchmakingServerListResponse | — | 3 | not exposed |
 | ISteamMatchmakingPingResponse | — | 2 | not exposed |
@@ -44,13 +44,13 @@ that this package links against, so it cannot drift from the binary.
 | [ISteamParentalSettings](interfaces/ISteamParentalSettings.md) | `SteamParentalSettings` | 6 | 6/6 |
 | [ISteamRemotePlay](interfaces/ISteamRemotePlay.md) | `SteamRemotePlay` | 8 | 8/8 |
 | [ISteamNetworkingMessages](interfaces/ISteamNetworkingMessages.md) | `SteamNetworkingMessages`, `SteamGameServerNetworkingMessages` | 6 | 6/6 |
-| [ISteamNetworkingSockets](interfaces/ISteamNetworkingSockets.md) | `SteamNetworkingSockets`, `SteamGameServerNetworkingSockets` | 47 | 42/47 |
-| [ISteamNetworkingUtils](interfaces/ISteamNetworkingUtils.md) | `SteamNetworkingUtils` | 41 | 32/41 |
+| [ISteamNetworkingSockets](interfaces/ISteamNetworkingSockets.md) | `SteamNetworkingSockets`, `SteamGameServerNetworkingSockets` | 47 | 43/47 |
+| [ISteamNetworkingUtils](interfaces/ISteamNetworkingUtils.md) | `SteamNetworkingUtils` | 41 | 39/41 |
 | [ISteamGameServer](interfaces/ISteamGameServer.md) | `SteamGameServer` | 41 | 41/41 |
 | [ISteamGameServerStats](interfaces/ISteamGameServerStats.md) | `SteamGameServerStats` | 10 | 10/10 |
-| [ISteamNetworkingFakeUDPPort](interfaces/ISteamNetworkingFakeUDPPort.md) | — | 4 | 3/4 |
+| [ISteamNetworkingFakeUDPPort](interfaces/ISteamNetworkingFakeUDPPort.md) | — | 4 | 4/4 |
 
-Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 22 not available, 23 hand-written.
+Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 33 hand-written, 12 not available.
 See [coverage](coverage.md) for every method that is not generated and why.
 
 - [Callbacks](callbacks.md): every callback and call result struct, with its id

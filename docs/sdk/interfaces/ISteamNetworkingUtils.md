@@ -29,7 +29,7 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamNetworkingUti
 | [GetPOPCount](#getpopcount) | `number` | Generated |
 | [GetPOPList](#getpoplist) | `{ result: number; list: Uint32Array }` | Generated |
 | [GetLocalTimestamp](#getlocaltimestamp) | `bigint` | Generated |
-| [SetDebugOutputFunction](#setdebugoutputfunction) | — | Not available |
+| [SetDebugOutputFunction](#setdebugoutputfunction) | `void` | Hand-written |
 | [IsFakeIPv4](#isfakeipv4) | `boolean` | Generated |
 | [GetIPv4FakeIPType](#getipv4fakeiptype) | `ESteamNetworkingFakeIPType` | Generated |
 | [GetRealIdentityForFakeIP](#getrealidentityforfakeip) | `{ result: EResult; pOutRealIdentity: SteamNetworkingIdentity }` | Generated |
@@ -40,12 +40,12 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamNetworkingUti
 | [SetConnectionConfigValueInt32](#setconnectionconfigvalueint32) | `boolean` | Generated |
 | [SetConnectionConfigValueFloat](#setconnectionconfigvaluefloat) | `boolean` | Generated |
 | [SetConnectionConfigValueString](#setconnectionconfigvaluestring) | `boolean` | Generated |
-| [SetGlobalCallback_SteamNetConnectionStatusChanged](#setglobalcallback_steamnetconnectionstatuschanged) | — | Not available |
-| [SetGlobalCallback_SteamNetAuthenticationStatusChanged](#setglobalcallback_steamnetauthenticationstatuschanged) | — | Not available |
-| [SetGlobalCallback_SteamRelayNetworkStatusChanged](#setglobalcallback_steamrelaynetworkstatuschanged) | — | Not available |
-| [SetGlobalCallback_FakeIPResult](#setglobalcallback_fakeipresult) | — | Not available |
-| [SetGlobalCallback_MessagesSessionRequest](#setglobalcallback_messagessessionrequest) | — | Not available |
-| [SetGlobalCallback_MessagesSessionFailed](#setglobalcallback_messagessessionfailed) | — | Not available |
+| [SetGlobalCallback_SteamNetConnectionStatusChanged](#setglobalcallback_steamnetconnectionstatuschanged) | `boolean` | Hand-written |
+| [SetGlobalCallback_SteamNetAuthenticationStatusChanged](#setglobalcallback_steamnetauthenticationstatuschanged) | `boolean` | Hand-written |
+| [SetGlobalCallback_SteamRelayNetworkStatusChanged](#setglobalcallback_steamrelaynetworkstatuschanged) | `boolean` | Hand-written |
+| [SetGlobalCallback_FakeIPResult](#setglobalcallback_fakeipresult) | `boolean` | Hand-written |
+| [SetGlobalCallback_MessagesSessionRequest](#setglobalcallback_messagessessionrequest) | `boolean` | Hand-written |
+| [SetGlobalCallback_MessagesSessionFailed](#setglobalcallback_messagessessionfailed) | `boolean` | Hand-written |
 | [SetConfigValue](#setconfigvalue) | `boolean` | Hand-written |
 | [SetConfigValueStruct](#setconfigvaluestruct) | `boolean` | Generated |
 | [GetConfigValue](#getconfigvalue) | `{ result: ESteamNetworkingGetConfigValueResult; pOutDataType: ESteamNetworkingConfigDataType; pResult: Uint8Array; cbResult: bigint }` | Generated |
@@ -417,7 +417,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#GetLocalTim
 
 ### SetDebugOutputFunction
 
-**Not available:** Takes a native function pointer.
+```ts
+sdk.SteamNetworkingUtils.SetDebugOutputFunction(eDetailLevel: ESteamNetworkingSocketsDebugOutputType, pfnFunc: ((nType: ESteamNetworkingSocketsDebugOutputType, pszMsg: string | null) => void) | null): void
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump, even when Steam produces them on its own threads.
 
 ```cpp
 void SetDebugOutputFunction( ESteamNetworkingSocketsDebugOutputType eDetailLevel, FSteamNetworkingSocketsDebugOutput pfnFunc )
@@ -658,7 +662,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetConnecti
 
 ### SetGlobalCallback_SteamNetConnectionStatusChanged
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamNetConnectionStatusChangedCallback_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_SteamNetConnectionStatusChanged(fnCallback: ((info: SteamNetConnectionStatusChangedCallback_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_SteamNetConnectionStatusChanged( FnSteamNetConnectionStatusChanged fnCallback )
@@ -677,7 +685,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCa
 
 ### SetGlobalCallback_SteamNetAuthenticationStatusChanged
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamNetAuthenticationStatus_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_SteamNetAuthenticationStatusChanged(fnCallback: ((info: SteamNetAuthenticationStatus_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_SteamNetAuthenticationStatusChanged( FnSteamNetAuthenticationStatusChanged fnCallback )
@@ -693,7 +705,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCa
 
 ### SetGlobalCallback_SteamRelayNetworkStatusChanged
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamRelayNetworkStatus_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_SteamRelayNetworkStatusChanged(fnCallback: ((info: SteamRelayNetworkStatus_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_SteamRelayNetworkStatusChanged( FnSteamRelayNetworkStatusChanged fnCallback )
@@ -709,7 +725,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCa
 
 ### SetGlobalCallback_FakeIPResult
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingFakeIPResult_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_FakeIPResult(fnCallback: ((info: SteamNetworkingFakeIPResult_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_FakeIPResult( FnSteamNetworkingFakeIPResult fnCallback )
@@ -725,7 +745,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCa
 
 ### SetGlobalCallback_MessagesSessionRequest
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionRequest_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_MessagesSessionRequest(fnCallback: ((info: SteamNetworkingMessagesSessionRequest_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_MessagesSessionRequest( FnSteamNetworkingMessagesSessionRequest fnCallback )
@@ -741,7 +765,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCa
 
 ### SetGlobalCallback_MessagesSessionFailed
 
-**Not available:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionFailed_t') instead.
+```ts
+sdk.SteamNetworkingUtils.SetGlobalCallback_MessagesSessionFailed(fnCallback: ((info: SteamNetworkingMessagesSessionFailed_t) => void) | null): boolean
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
 
 ```cpp
 bool SetGlobalCallback_MessagesSessionFailed( FnSteamNetworkingMessagesSessionFailed fnCallback )

@@ -48,6 +48,8 @@ export function emitRust(model) {
     out.push('')
 
     // --- tables -----------------------------------------------------------------
+    out.push(`pub static INTERFACE_NAMES: &[&str] = &[${interfaces.map(i => JSON.stringify(i.name)).join(', ')}];`)
+    out.push('')
     out.push('pub static ACCESSORS: &[Accessor] = &[')
     for (const a of accessors) {
         out.push(`    Accessor { name: ${JSON.stringify(a.name)}, interface: ${ifaceIndex.get(a.iface)}, pipe: ${PIPE[a.kind]}, get: ${a.flat} },`)

@@ -7,9 +7,9 @@ This layer covers 999 flat API methods (interface and struct methods) from `Stea
 | Status | Methods | Meaning |
 |---|---|---|
 | Generated | 908 | Bound mechanically from steam_api.json and the bindgen types. |
-| Hand-written | 23 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
+| Hand-written | 33 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
 | Not implemented yet | 0 | Expressible, but not written yet. |
-| Not available | 22 | Cannot be called safely from JavaScript, or the type is not in the public SDK. |
+| Not available | 12 | Cannot be called safely from JavaScript, or the type is not in the public SDK. |
 | Not exposed | 46 | Interfaces that only exist to be implemented by C++ code, or plumbing init() already handles. |
 
 Calling a method that is not available throws a `SteamSdkError` with the reason below.
@@ -18,6 +18,7 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 
 | Method | Reason |
 |---|---|
+| `ISteamUtils.SetWarningMessageHook` | Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump. |
 | `ISteamMatchmakingServers.RequestInternetServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods; src/sdk/servers.rs passes Steam a native object that forwards to it. |
 | `ISteamMatchmakingServers.RequestLANServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
 | `ISteamMatchmakingServers.RequestFriendsServerList` | Takes a JavaScript object with the ISteamMatchmakingServerListResponse methods. |
@@ -40,28 +41,27 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 | `ISteamNetworkingSockets.SendMessages` | Takes message descriptions and allocates the native messages itself. |
 | `ISteamNetworkingSockets.ReceiveMessagesOnConnection` | Returns copies of the received messages and releases the native ones. |
 | `ISteamNetworkingSockets.ReceiveMessagesOnPollGroup` | Returns copies of the received messages and releases the native ones. |
+| `ISteamNetworkingSockets.CreateFakeUDPPort` | Returns a JavaScript object for the port; its methods reach Steam through a handle checked against live ports. |
+| `ISteamNetworkingUtils.SetDebugOutputFunction` | Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump, even when Steam produces them on its own threads. |
+| `ISteamNetworkingUtils.SetGlobalCallback_SteamNetConnectionStatusChanged` | Takes a JavaScript handler (or null) instead of a function pointer. |
+| `ISteamNetworkingUtils.SetGlobalCallback_SteamNetAuthenticationStatusChanged` | Takes a JavaScript handler (or null) instead of a function pointer. |
+| `ISteamNetworkingUtils.SetGlobalCallback_SteamRelayNetworkStatusChanged` | Takes a JavaScript handler (or null) instead of a function pointer. |
+| `ISteamNetworkingUtils.SetGlobalCallback_FakeIPResult` | Takes a JavaScript handler (or null) instead of a function pointer. |
+| `ISteamNetworkingUtils.SetGlobalCallback_MessagesSessionRequest` | Takes a JavaScript handler (or null) instead of a function pointer. |
+| `ISteamNetworkingUtils.SetGlobalCallback_MessagesSessionFailed` | Takes a JavaScript handler (or null) instead of a function pointer. |
 | `ISteamNetworkingUtils.SetConfigValue` | pArg points to an int32, int64, float, string or pointer depending on eDataType. |
+| `ISteamNetworkingFakeUDPPort.ReceiveMessages` | Returns copies of the received messages and releases the native ones. |
 
 ## Not available
 
 | Method | Reason |
 |---|---|
-| `ISteamUtils.SetWarningMessageHook` | pFunction: type SteamAPIWarningMessageHook_t |
 | `ISteamNetworkingSockets.GetHostedDedicatedServerAddress` | pRouting: SteamDatagramHostedAddress is not defined in the public SDK headers shipped with steamworks-sys |
 | `ISteamNetworkingSockets.GetGameCoordinatorServerLogin` | pLoginInfo: SteamDatagramGameCoordinatorServerLogin is not defined in the public SDK headers shipped with steamworks-sys |
 | `ISteamNetworkingSockets.ConnectP2PCustomSignaling` | Requires a native ISteamNetworkingConnectionSignaling object implemented by the game. |
 | `ISteamNetworkingSockets.ReceivedP2PCustomSignal` | Requires a native ISteamNetworkingSignalingRecvContext object implemented by the game. |
-| `ISteamNetworkingSockets.CreateFakeUDPPort` | Returns a native ISteamNetworkingFakeUDPPort object. |
 | `ISteamNetworkingUtils.AllocateMessage` | Returns a native message JavaScript cannot own. SteamNetworkingSockets.SendMessages allocates messages from the payloads you pass it. |
-| `ISteamNetworkingUtils.SetDebugOutputFunction` | Takes a native function pointer. |
 | `ISteamNetworkingUtils.SetGlobalConfigValuePtr` | Stores a raw native pointer (usually a function pointer) inside Steam. JavaScript cannot provide one safely. |
-| `ISteamNetworkingUtils.SetGlobalCallback_SteamNetConnectionStatusChanged` | Takes a native function pointer. Subscribe with sdk.on('SteamNetConnectionStatusChangedCallback_t') instead. |
-| `ISteamNetworkingUtils.SetGlobalCallback_SteamNetAuthenticationStatusChanged` | Takes a native function pointer. Subscribe with sdk.on('SteamNetAuthenticationStatus_t') instead. |
-| `ISteamNetworkingUtils.SetGlobalCallback_SteamRelayNetworkStatusChanged` | Takes a native function pointer. Subscribe with sdk.on('SteamRelayNetworkStatus_t') instead. |
-| `ISteamNetworkingUtils.SetGlobalCallback_FakeIPResult` | Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingFakeIPResult_t') instead. |
-| `ISteamNetworkingUtils.SetGlobalCallback_MessagesSessionRequest` | Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionRequest_t') instead. |
-| `ISteamNetworkingUtils.SetGlobalCallback_MessagesSessionFailed` | Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionFailed_t') instead. |
-| `ISteamNetworkingFakeUDPPort.ReceiveMessages` | ppOutMessages: pointer to pointer (*mut *mut SteamNetworkingMessage_t) |
 | `SteamNetworkingMessage_t.Release` | Received messages are copied into JavaScript and released immediately, so there is nothing to release. |
 | `SteamNetworkingConfigValue_t.SetPtr` | Stores a raw native pointer in the struct. |
 | `SteamNetworkingConfigValue_t.SetString` | Stores a pointer to the string, which would dangle once the call returns. Use SteamNetworkingUtils.SetGlobalConfigValueString / SetConnectionConfigValueString instead. |

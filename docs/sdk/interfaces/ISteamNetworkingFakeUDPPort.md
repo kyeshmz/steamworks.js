@@ -11,8 +11,7 @@
 
 Valve documentation: <https://partner.steamgames.com/doc/api/ISteamNetworkingFakeUDPPort>
 
-| Accessor | C++ | Needs |
-|---|---|---|
+There is no accessor: `sdk.SteamNetworkingSockets.CreateFakeUDPPort(idxFakeServerPort)` returns an object with these methods.
 
 ## Methods
 
@@ -20,13 +19,13 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamNetworkingFak
 |---|---|---|
 | [DestroyFakeUDPPort](#destroyfakeudpport) | `void` | Generated |
 | [SendMessageToFakeIP](#sendmessagetofakeip) | `EResult` | Generated |
-| [ReceiveMessages](#receivemessages) | — | Not available |
+| [ReceiveMessages](#receivemessages) | `{ result: number; ppOutMessages: SteamNetworkingMessageCopy[] }` | Hand-written |
 | [ScheduleCleanup](#schedulecleanup) | `void` | Generated |
 
 ### DestroyFakeUDPPort
 
 ```ts
-sdk.ISteamNetworkingFakeUDPPort.DestroyFakeUDPPort(): void
+sdk.port.DestroyFakeUDPPort(): void
 ```
 
 ```cpp
@@ -43,7 +42,7 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingFakeUDPPort#Destr
 ### SendMessageToFakeIP
 
 ```ts
-sdk.ISteamNetworkingFakeUDPPort.SendMessageToFakeIP(remoteAddress: SteamNetworkingIPAddr, pData: Uint8Array | ArrayBuffer, cbData: number, nSendFlags: number): EResult
+sdk.port.SendMessageToFakeIP(remoteAddress: SteamNetworkingIPAddr, pData: Uint8Array | ArrayBuffer, cbData: number, nSendFlags: number): EResult
 ```
 
 ```cpp
@@ -83,7 +82,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingFakeUDPPort#SendM
 
 ### ReceiveMessages
 
-**Not available:** ppOutMessages: pointer to pointer (*mut *mut SteamNetworkingMessage_t)
+```ts
+sdk.port.ReceiveMessages(nMaxMessages: number): { result: number; ppOutMessages: SteamNetworkingMessageCopy[] }
+```
+
+Hand-written binding: Returns copies of the received messages and releases the native ones.
 
 ```cpp
 int ReceiveMessages( SteamNetworkingMessage_t ** ppOutMessages, int nMaxMessages )
@@ -106,7 +109,7 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingFakeUDPPort#Recei
 ### ScheduleCleanup
 
 ```ts
-sdk.ISteamNetworkingFakeUDPPort.ScheduleCleanup(remoteAddress: SteamNetworkingIPAddr): void
+sdk.port.ScheduleCleanup(remoteAddress: SteamNetworkingIPAddr): void
 ```
 
 ```cpp

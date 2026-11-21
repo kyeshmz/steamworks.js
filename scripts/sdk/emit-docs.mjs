@@ -1,7 +1,7 @@
 // Emits the Markdown API reference under docs/sdk/.
 
 import {
-    VALVE, cppSignature, docLocation, MANUAL_TS, pageForLocation, paramNote, tsParams, tsRecord,
+    OBJECT_SOURCES, VALVE, cppSignature, docLocation, MANUAL_TS, pageForLocation, paramNote, tsParams, tsRecord,
     tsResult, valveMethodUrl,
 } from './common.mjs'
 
@@ -85,10 +85,14 @@ export function emitDocs(model, inputs) {
         const page = header(iface.name)
         if (iface.doc) page.push(quote(iface.doc), '')
         page.push(`Valve documentation: <${VALVE}/${iface.name}>`, '')
-        page.push('| Accessor | C++ | Needs |', '|---|---|---|')
-        for (const a of iface.accessors) {
-            const needs = a.kind === 'gameserver' ? '`initGameServer()`' : a.kind === 'global' ? '`init()` or `initGameServer()`' : '`init()`'
-            page.push(`| \`sdk.${a.name}\` | \`${a.name}()\` | ${needs} |`)
+        if (iface.accessors.length) {
+            page.push('| Accessor | C++ | Needs |', '|---|---|---|')
+            for (const a of iface.accessors) {
+                const needs = a.kind === 'gameserver' ? '`initGameServer()`' : a.kind === 'global' ? '`init()` or `initGameServer()`' : '`init()`'
+                page.push(`| \`sdk.${a.name}\` | \`${a.name}()\` | ${needs} |`)
+            }
+        } else if (OBJECT_SOURCES[iface.name]) {
+            page.push(`There is no accessor: \`${OBJECT_SOURCES[iface.name]}\` returns an object with these methods.`)
         }
         page.push('')
         if (iface.pending) page.push(`**Not implemented yet:** ${iface.pending}`, '')
@@ -99,7 +103,7 @@ export function emitDocs(model, inputs) {
             page.push(`| [${m.jsName}](#${anchor(m.jsName)}) | ${ret} | ${STATUS_LABEL[m.status]} |`)
         }
         page.push('')
-        const accessor = iface.accessors[0]?.name ?? iface.name
+        const accessor = iface.accessors[0]?.name ?? (OBJECT_SOURCES[iface.name] ? 'port' : iface.name)
         for (const m of iface.methods) page.push(...methodSection(model, m, accessor, group, byFlat))
         files[`docs/sdk/interfaces/${iface.name}.md`] = page.join('\n') + '\n'
     }

@@ -4,6 +4,11 @@ import { NUM_INFO } from './model.mjs'
 
 export const VALVE = 'https://partner.steamgames.com/doc/api'
 
+/** Interfaces without an accessor, and the call that returns an object implementing them. */
+export const OBJECT_SOURCES = {
+    ISteamNetworkingFakeUDPPort: 'sdk.SteamNetworkingSockets.CreateFakeUDPPort(idxFakeServerPort)',
+}
+
 /** Valve documentation page for a header file. */
 export function pageForLocation(location, docs) {
     if (!location) return 'steam_api'
@@ -229,6 +234,46 @@ export const MANUAL_TS = {
     SteamAPI_ISteamMatchmakingServers_CancelServerQuery: {
         params: 'hServerQuery: number',
         ret: 'void',
+    },
+    SteamAPI_ISteamUtils_SetWarningMessageHook: {
+        params: 'pFunction: ((nSeverity: number, pchDebugText: string | null) => void) | null',
+        ret: 'void',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction: {
+        params: 'eDetailLevel: ESteamNetworkingSocketsDebugOutputType, pfnFunc: ((nType: ESteamNetworkingSocketsDebugOutputType, pszMsg: string | null) => void) | null',
+        ret: 'void',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetConnectionStatusChanged: {
+        params: 'fnCallback: ((info: SteamNetConnectionStatusChangedCallback_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetAuthenticationStatusChanged: {
+        params: 'fnCallback: ((info: SteamNetAuthenticationStatus_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamRelayNetworkStatusChanged: {
+        params: 'fnCallback: ((info: SteamRelayNetworkStatus_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_FakeIPResult: {
+        params: 'fnCallback: ((info: SteamNetworkingFakeIPResult_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionRequest: {
+        params: 'fnCallback: ((info: SteamNetworkingMessagesSessionRequest_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionFailed: {
+        params: 'fnCallback: ((info: SteamNetworkingMessagesSessionFailed_t) => void) | null',
+        ret: 'boolean',
+    },
+    SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort: {
+        params: 'idxFakeServerPort: number',
+        ret: 'ISteamNetworkingFakeUDPPort | null',
+    },
+    SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages: {
+        params: 'nMaxMessages: number',
+        ret: '{ result: number; ppOutMessages: SteamNetworkingMessageCopy[] }',
     },
     SteamAPI_ISteamNetworkingUtils_SetConfigValue: {
         params: 'eValue: ESteamNetworkingConfigValue, eScopeType: ESteamNetworkingConfigScope, scopeObj: bigint | number, eDataType: ESteamNetworkingConfigDataType, pArg: number | bigint | string',

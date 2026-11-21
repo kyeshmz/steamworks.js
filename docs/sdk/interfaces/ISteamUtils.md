@@ -29,7 +29,7 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamUtils>
 | [GetAPICallFailureReason](#getapicallfailurereason) | `ESteamAPICallFailure` | Generated |
 | [GetAPICallResult](#getapicallresult) | `{ result: boolean; pCallback: Uint8Array; pbFailed: boolean }` | Generated |
 | [GetIPCCallCount](#getipccallcount) | `number` | Generated |
-| [SetWarningMessageHook](#setwarningmessagehook) | — | Not available |
+| [SetWarningMessageHook](#setwarningmessagehook) | `void` | Hand-written |
 | [IsOverlayEnabled](#isoverlayenabled) | `boolean` | Generated |
 | [BOverlayNeedsPresent](#boverlayneedspresent) | `boolean` | Generated |
 | [CheckFileSignature](#checkfilesignature) | `Promise<CheckFileSignature_t>` | Generated |
@@ -292,7 +292,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamUtils#GetIPCCallCount>
 
 ### SetWarningMessageHook
 
-**Not available:** pFunction: type SteamAPIWarningMessageHook_t
+```ts
+sdk.SteamUtils.SetWarningMessageHook(pFunction: ((nSeverity: number, pchDebugText: string | null) => void) | null): void
+```
+
+Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump.
 
 ```cpp
 void SetWarningMessageHook( SteamAPIWarningMessageHook_t pFunction )

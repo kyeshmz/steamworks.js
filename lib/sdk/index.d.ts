@@ -12118,13 +12118,13 @@ export interface ISteamUtils {
      * 'const char *' is the text of the message
      * callbacks will occur directly after the API function is called that generated the warning or message
      *
-     * **Not available from JavaScript:** pFunction: type SteamAPIWarningMessageHook_t
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump.
      *
      * @param pFunction `SteamAPIWarningMessageHook_t`
      * C++: `void SetWarningMessageHook( SteamAPIWarningMessageHook_t pFunction )`
      * @see https://partner.steamgames.com/doc/api/ISteamUtils#SetWarningMessageHook
      */
-    SetWarningMessageHook(...args: never[]): never
+    SetWarningMessageHook(pFunction: ((nSeverity: number, pchDebugText: string | null) => void) | null): void
     /**
      * Returns true if the overlay is running & the user can access it. The overlay process could take a few seconds to
      * start & hook the game process, so this function will initially return false while the overlay is loading.
@@ -19597,13 +19597,13 @@ export interface ISteamNetworkingSockets {
      * When the peer receives packets sent from this interface, the peer will
      * assign a FakeIP from its own locally-controlled namespace.
      *
-     * **Not available from JavaScript:** Returns a native ISteamNetworkingFakeUDPPort object.
+     * Hand-written binding: Returns a JavaScript object for the port; its methods reach Steam through a handle checked against live ports.
      *
      * @param idxFakeServerPort `int`
      * C++: `ISteamNetworkingFakeUDPPort * CreateFakeUDPPort( int idxFakeServerPort )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingSockets#CreateFakeUDPPort
      */
-    CreateFakeUDPPort(...args: never[]): never
+    CreateFakeUDPPort(idxFakeServerPort: number): ISteamNetworkingFakeUDPPort | null
 }
 
 /**
@@ -19880,14 +19880,14 @@ export interface ISteamNetworkingUtils {
      * Your output function must be threadsafe and fast!  Do not make any other
      * Steamworks calls from within the handler.
      *
-     * **Not available from JavaScript:** Takes a native function pointer.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer; messages are delivered by the callback pump, even when Steam produces them on its own threads.
      *
      * @param eDetailLevel `ESteamNetworkingSocketsDebugOutputType`
      * @param pfnFunc `FSteamNetworkingSocketsDebugOutput`
      * C++: `void SetDebugOutputFunction( ESteamNetworkingSocketsDebugOutputType eDetailLevel, FSteamNetworkingSocketsDebugOutput pfnFunc )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetDebugOutputFunction
      */
-    SetDebugOutputFunction(...args: never[]): never
+    SetDebugOutputFunction(eDetailLevel: ESteamNetworkingSocketsDebugOutputType, pfnFunc: ((nType: ESteamNetworkingSocketsDebugOutputType, pszMsg: string | null) => void) | null): void
     /**
      * Return true if an IPv4 address is one that might be used as a "fake" one.
      * This function is fast; it just does some logical tests on the IP and does
@@ -19988,53 +19988,53 @@ export interface ISteamNetworkingUtils {
      * simply install these callbacks first thing, and you are good to go.
      * See ISteamNetworkingSockets::RunCallbacks
      *
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamNetConnectionStatusChangedCallback_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamNetConnectionStatusChanged`
      * C++: `bool SetGlobalCallback_SteamNetConnectionStatusChanged( FnSteamNetConnectionStatusChanged fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_SteamNetConnectionStatusChanged
      */
-    SetGlobalCallback_SteamNetConnectionStatusChanged(...args: never[]): never
+    SetGlobalCallback_SteamNetConnectionStatusChanged(fnCallback: ((info: SteamNetConnectionStatusChangedCallback_t) => void) | null): boolean
     /**
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamNetAuthenticationStatus_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamNetAuthenticationStatusChanged`
      * C++: `bool SetGlobalCallback_SteamNetAuthenticationStatusChanged( FnSteamNetAuthenticationStatusChanged fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_SteamNetAuthenticationStatusChanged
      */
-    SetGlobalCallback_SteamNetAuthenticationStatusChanged(...args: never[]): never
+    SetGlobalCallback_SteamNetAuthenticationStatusChanged(fnCallback: ((info: SteamNetAuthenticationStatus_t) => void) | null): boolean
     /**
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamRelayNetworkStatus_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamRelayNetworkStatusChanged`
      * C++: `bool SetGlobalCallback_SteamRelayNetworkStatusChanged( FnSteamRelayNetworkStatusChanged fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_SteamRelayNetworkStatusChanged
      */
-    SetGlobalCallback_SteamRelayNetworkStatusChanged(...args: never[]): never
+    SetGlobalCallback_SteamRelayNetworkStatusChanged(fnCallback: ((info: SteamRelayNetworkStatus_t) => void) | null): boolean
     /**
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingFakeIPResult_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamNetworkingFakeIPResult`
      * C++: `bool SetGlobalCallback_FakeIPResult( FnSteamNetworkingFakeIPResult fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_FakeIPResult
      */
-    SetGlobalCallback_FakeIPResult(...args: never[]): never
+    SetGlobalCallback_FakeIPResult(fnCallback: ((info: SteamNetworkingFakeIPResult_t) => void) | null): boolean
     /**
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionRequest_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamNetworkingMessagesSessionRequest`
      * C++: `bool SetGlobalCallback_MessagesSessionRequest( FnSteamNetworkingMessagesSessionRequest fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_MessagesSessionRequest
      */
-    SetGlobalCallback_MessagesSessionRequest(...args: never[]): never
+    SetGlobalCallback_MessagesSessionRequest(fnCallback: ((info: SteamNetworkingMessagesSessionRequest_t) => void) | null): boolean
     /**
-     * **Not available from JavaScript:** Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionFailed_t') instead.
+     * Hand-written binding: Takes a JavaScript handler (or null) instead of a function pointer.
      *
      * @param fnCallback `FnSteamNetworkingMessagesSessionFailed`
      * C++: `bool SetGlobalCallback_MessagesSessionFailed( FnSteamNetworkingMessagesSessionFailed fnCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingUtils#SetGlobalCallback_MessagesSessionFailed
      */
-    SetGlobalCallback_MessagesSessionFailed(...args: never[]): never
+    SetGlobalCallback_MessagesSessionFailed(fnCallback: ((info: SteamNetworkingMessagesSessionFailed_t) => void) | null): boolean
     /**
      * Set a configuration value.
      * - eValue: which value is being set
@@ -20761,14 +20761,14 @@ export interface ISteamNetworkingFakeUDPPort {
      * SteamNetworkingMessage_t::m_identity in the returned message(s) will always contain
      * a FakeIP.  See ISteamNetworkingUtils::GetRealIdentityForFakeIP.
      *
-     * **Not available from JavaScript:** ppOutMessages: pointer to pointer (*mut *mut SteamNetworkingMessage_t)
+     * Hand-written binding: Returns copies of the received messages and releases the native ones.
      *
      * @param ppOutMessages `SteamNetworkingMessage_t **`
      * @param nMaxMessages `int`
      * C++: `int ReceiveMessages( SteamNetworkingMessage_t ** ppOutMessages, int nMaxMessages )`
      * @see https://partner.steamgames.com/doc/api/ISteamNetworkingFakeUDPPort#ReceiveMessages
      */
-    ReceiveMessages(...args: never[]): never
+    ReceiveMessages(nMaxMessages: number): { result: number; ppOutMessages: SteamNetworkingMessageCopy[] }
     /**
      * Schedule the internal connection for a given peer to be cleaned up in a few seconds.
      *

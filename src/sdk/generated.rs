@@ -956,6 +956,8 @@ extern "C" {
     fn SteamAPI_SteamNetworkingConfigValue_t_SetFloat(p0: *mut c_void, p1: u32, p2: f32);
 }
 
+pub static INTERFACE_NAMES: &[&str] = &["ISteamUser", "ISteamFriends", "ISteamUtils", "ISteamMatchmaking", "ISteamMatchmakingServers", "ISteamGameSearch", "ISteamParties", "ISteamRemoteStorage", "ISteamUserStats", "ISteamApps", "ISteamNetworking", "ISteamScreenshots", "ISteamMusic", "ISteamMusicRemote", "ISteamHTTP", "ISteamInput", "ISteamController", "ISteamUGC", "ISteamHTMLSurface", "ISteamInventory", "ISteamTimeline", "ISteamVideo", "ISteamParentalSettings", "ISteamRemotePlay", "ISteamNetworkingMessages", "ISteamNetworkingSockets", "ISteamNetworkingUtils", "ISteamGameServer", "ISteamGameServerStats", "ISteamNetworkingFakeUDPPort"];
+
 pub static ACCESSORS: &[Accessor] = &[
     Accessor { name: "SteamUser", interface: 0, pipe: Pipe::Client, get: SteamAPI_SteamUser_v023 },
     Accessor { name: "SteamFriends", interface: 1, pipe: Pipe::Client, get: SteamAPI_SteamFriends_v017 },
@@ -2161,7 +2163,7 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         159 => m159(env, iface, pipe, a),
         160 => m160(env, iface, pipe, a),
         161 => m161(env, iface, pipe, a),
-        162 => Err(unavailable("SteamAPI_ISteamUtils_SetWarningMessageHook", "pFunction: type SteamAPIWarningMessageHook_t")),
+        162 => manual::SteamAPI_ISteamUtils_SetWarningMessageHook(env, iface, pipe, a),
         163 => m163(env, iface, pipe, a),
         164 => m164(env, iface, pipe, a),
         165 => m165(env, iface, pipe, a),
@@ -2835,7 +2837,7 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         833 => m833(env, iface, pipe, a),
         834 => m834(env, iface, pipe, a),
         835 => m835(env, iface, pipe, a),
-        836 => Err(unavailable("SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort", "Returns a native ISteamNetworkingFakeUDPPort object.")),
+        836 => manual::SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort(env, iface, pipe, a),
         837 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_AllocateMessage", "Returns a native message JavaScript cannot own. SteamNetworkingSockets.SendMessages allocates messages from the payloads you pass it.")),
         838 => m838(env, iface, pipe, a),
         839 => m839(env, iface, pipe, a),
@@ -2850,7 +2852,7 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         848 => m848(env, iface, pipe, a),
         849 => m849(env, iface, pipe, a),
         850 => m850(env, iface, pipe, a),
-        851 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction", "Takes a native function pointer.")),
+        851 => manual::SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction(env, iface, pipe, a),
         852 => m852(env, iface, pipe, a),
         853 => m853(env, iface, pipe, a),
         854 => m854(env, iface, pipe, a),
@@ -2861,12 +2863,12 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         859 => m859(env, iface, pipe, a),
         860 => m860(env, iface, pipe, a),
         861 => m861(env, iface, pipe, a),
-        862 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetConnectionStatusChanged", "Takes a native function pointer. Subscribe with sdk.on('SteamNetConnectionStatusChangedCallback_t') instead.")),
-        863 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetAuthenticationStatusChanged", "Takes a native function pointer. Subscribe with sdk.on('SteamNetAuthenticationStatus_t') instead.")),
-        864 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamRelayNetworkStatusChanged", "Takes a native function pointer. Subscribe with sdk.on('SteamRelayNetworkStatus_t') instead.")),
-        865 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_FakeIPResult", "Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingFakeIPResult_t') instead.")),
-        866 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionRequest", "Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionRequest_t') instead.")),
-        867 => Err(unavailable("SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionFailed", "Takes a native function pointer. Subscribe with sdk.on('SteamNetworkingMessagesSessionFailed_t') instead.")),
+        862 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetConnectionStatusChanged(env, iface, pipe, a),
+        863 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetAuthenticationStatusChanged(env, iface, pipe, a),
+        864 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamRelayNetworkStatusChanged(env, iface, pipe, a),
+        865 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_FakeIPResult(env, iface, pipe, a),
+        866 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionRequest(env, iface, pipe, a),
+        867 => manual::SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionFailed(env, iface, pipe, a),
         868 => manual::SteamAPI_ISteamNetworkingUtils_SetConfigValue(env, iface, pipe, a),
         869 => m869(env, iface, pipe, a),
         870 => m870(env, iface, pipe, a),
@@ -2930,7 +2932,7 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         928 => m928(env, iface, pipe, a),
         929 => m929(env, iface, pipe, a),
         930 => m930(env, iface, pipe, a),
-        931 => Err(unavailable("SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages", "ppOutMessages: pointer to pointer (*mut *mut SteamNetworkingMessage_t)")),
+        931 => manual::SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages(env, iface, pipe, a),
         932 => m932(env, iface, pipe, a),
         933 => m933(env, iface, pipe, a),
         934 => m934(env, iface, pipe, a),

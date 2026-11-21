@@ -164,7 +164,7 @@ test('calls that need Steam fail cleanly before init()', () => {
 })
 
 test('unavailable methods explain why', () => {
-    throwsSdk(() => sdk.SteamNetworkingUtils.SetGlobalCallback_SteamNetConnectionStatusChanged(), /sdk\.on\('SteamNetConnectionStatusChangedCallback_t'\)/)
+    throwsSdk(() => sdk.SteamNetworkingUtils.SetGlobalConfigValuePtr(), /raw native pointer/)
     throwsSdk(() => sdk.SteamNetworkingSockets.ConnectP2PCustomSignaling(), /ISteamNetworkingConnectionSignaling/)
     throwsSdk(() => sdk.SteamNetworkingUtils.AllocateMessage(16), /SendMessages allocates messages/)
 })
@@ -371,6 +371,47 @@ async function dispatchTests() {
             fake.sdkCall = saved
             assert.deepEqual(seen, [['responded', 123n, 2], ['complete', 123n, 0], ['ping', true, 42]])
             assert.deepEqual(calls.at(-1), [123n])
+        })
+
+        test('function-pointer hooks call their JavaScript handlers', () => {
+            const saved = fake.sdkCall
+            const calls = []
+            fake.sdkCall = (index, accessor, args) => { calls.push(args); return true }
+            const seen = []
+            sdk.SteamUtils.SetWarningMessageHook((severity, text) => seen.push(['warning', severity, text]))
+            sdk.SteamNetworkingUtils.SetDebugOutputFunction(4, (type, msg) => seen.push(['debug', type, msg]))
+            assert.equal(sdk.SteamNetworkingUtils.SetGlobalCallback_SteamRelayNetworkStatusChanged((info) => seen.push(['relay', info.constructor.name])), true)
+            const int = (v) => { const b = Buffer.alloc(4); b.writeInt32LE(v); return b }
+            queue.push([0, 0, -3, null, false, int(1), ['careful']])
+            queue.push([0, 0, -4, null, false, int(5), ['connected']])
+            queue.push([0, 0, -10 - 2, null, false, Buffer.alloc(sdk.SteamRelayNetworkStatus_t.size), []])
+            runtime.pump()
+            sdk.SteamUtils.SetWarningMessageHook(null)
+            queue.push([0, 0, -3, null, false, int(1), ['ignored']])
+            runtime.pump()
+            fake.sdkCall = saved
+            assert.deepEqual(calls, [[true], [4, true], [true], [false]])
+            assert.deepEqual(seen, [['warning', 1, 'careful'], ['debug', 5, 'connected'], ['relay', 'SteamRelayNetworkStatus_t']])
+        })
+
+        test('CreateFakeUDPPort returns an object whose methods use the port handle', () => {
+            const saved = fake.sdkCall
+            fake.sdkCall = () => 0xabcn // CreateFakeUDPPort -> port handle
+            const calls = []
+            fake.sdkCallOn = (index, handle, args) => {
+                calls.push([handle, args])
+                return calls.length === 2 ? [1, [Buffer.from(new sdk.SteamNetworkingMessage_t().buffer), Buffer.from('hi')]] : sdk.EResult.k_EResultOK
+            }
+            const port = sdk.SteamNetworkingSockets.CreateFakeUDPPort(0)
+            fake.sdkCall = saved
+            assert.equal(String(port), '[object ISteamNetworkingFakeUDPPort]')
+            const addr = new sdk.SteamNetworkingIPAddr()
+            assert.equal(port.SendMessageToFakeIP(addr, Buffer.from('hi'), 2, 0), sdk.EResult.k_EResultOK)
+            const received = port.ReceiveMessages(16)
+            assert.equal(received.result, 1)
+            assert.equal(received.ppOutMessages[0].data.toString(), 'hi')
+            assert.deepEqual(calls.map(([h]) => h), [0xabcn, 0xabcn])
+            assert.equal(calls[1][1][1], 16)
         })
 
         await testAsync('reset rejects pending call results', async () => {

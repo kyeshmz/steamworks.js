@@ -8,6 +8,16 @@ use super::{js_bytes, js_i64, js_struct, pack, unavailable, Args, Pipe};
 
 // ISteamMatchmakingServers lives in its own module; the generated dispatch
 // reaches every hand-written method through this one.
+pub use super::hooks::{
+    SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_FakeIPResult,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionFailed,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_MessagesSessionRequest,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetAuthenticationStatusChanged,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamNetConnectionStatusChanged,
+    SteamAPI_ISteamNetworkingUtils_SetGlobalCallback_SteamRelayNetworkStatusChanged,
+    SteamAPI_ISteamUtils_SetWarningMessageHook,
+};
 pub use super::servers::{
     SteamAPI_ISteamMatchmakingServers_CancelQuery,
     SteamAPI_ISteamMatchmakingServers_CancelServerQuery,
@@ -67,6 +77,15 @@ mod ffi {
             pMessages: *const *mut Msg,
             pOutMessageNumberOrResult: *mut i64,
         );
+        pub fn SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort(
+            self_: *mut c_void,
+            idxFakeServerPort: i32,
+        ) -> *mut c_void;
+        pub fn SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages(
+            self_: *mut c_void,
+            ppOutMessages: *mut *mut Msg,
+            nMaxMessages: i32,
+        ) -> i32;
         pub fn SteamAPI_ISteamInput_EnableActionEventCallbacks(
             self_: *mut c_void,
             pCallback: Option<unsafe extern "C" fn(*mut steamworks::sys::SteamInputActionEvent_t)>,
@@ -333,4 +352,36 @@ pub unsafe fn SteamAPI_ISteamInput_EnableActionEventCallbacks(
         },
     );
     super::js_undefined(env)
+}
+
+/// Args: `[idxFakeServerPort]`. Returns the port object's handle (0 on failure).
+pub unsafe fn SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort(
+    env: &Env,
+    iface: *mut c_void,
+    _pipe: Pipe,
+    a: &Args,
+) -> Result<JsUnknown> {
+    let idx = a.int(0, "idxFakeServerPort", i32::MIN as i128, i32::MAX as i128)? as i32;
+    let port = ffi::SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort(iface, idx);
+    if !port.is_null() {
+        super::register_object(port);
+    }
+    super::js_u64(env, port as u64)
+}
+
+/// Args: `[ppOutMessages (unused), nMaxMessages]`; `iface` is the port object.
+pub unsafe fn SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages(
+    env: &Env,
+    iface: *mut c_void,
+    _pipe: Pipe,
+    a: &Args,
+) -> Result<JsUnknown> {
+    let max = batch(a, 1, "nMaxMessages")?;
+    let mut messages = vec![std::ptr::null_mut(); max as usize];
+    let n = ffi::SteamAPI_ISteamNetworkingFakeUDPPort_ReceiveMessages(
+        iface,
+        messages.as_mut_ptr(),
+        max,
+    );
+    take_messages(env, n, &mut messages)
 }

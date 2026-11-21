@@ -85,7 +85,7 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamNetworkingSoc
 | [GetFakeIP](#getfakeip) | `{ pInfo: SteamNetworkingFakeIPResult_t }` | Generated |
 | [CreateListenSocketP2PFakeIP](#createlistensocketp2pfakeip) | `number` | Generated |
 | [GetRemoteFakeIPForConnection](#getremotefakeipforconnection) | `{ result: EResult; pOutAddr: SteamNetworkingIPAddr }` | Generated |
-| [CreateFakeUDPPort](#createfakeudpport) | — | Not available |
+| [CreateFakeUDPPort](#createfakeudpport) | `ISteamNetworkingFakeUDPPort \| null` | Hand-written |
 
 ### CreateListenSocketIP
 
@@ -1615,7 +1615,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamNetworkingSockets#GetRemote
 
 ### CreateFakeUDPPort
 
-**Not available:** Returns a native ISteamNetworkingFakeUDPPort object.
+```ts
+sdk.SteamNetworkingSockets.CreateFakeUDPPort(idxFakeServerPort: number): ISteamNetworkingFakeUDPPort | null
+```
+
+Hand-written binding: Returns a JavaScript object for the port; its methods reach Steam through a handle checked against live ports.
 
 ```cpp
 ISteamNetworkingFakeUDPPort * CreateFakeUDPPort( int idxFakeServerPort )
