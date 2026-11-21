@@ -807,7 +807,9 @@ impl<Manager> UGC<Manager> {
     {
         unsafe {
             let api_call = sys::SteamAPI_ISteamUGC_DeleteItem(self.ugc, published_file_id.0);
-            register_call_result::<sys::DownloadItemResult_t, _, _>(
+            // steamworks.js: backported from upstream master; this read the
+            // 12-byte DeleteItemResult_t as a 16-byte DownloadItemResult_t.
+            register_call_result::<sys::DeleteItemResult_t, _, _>(
                 &self.inner,
                 api_call,
                 CALLBACK_REMOTE_STORAGE_BASE_ID + 17,

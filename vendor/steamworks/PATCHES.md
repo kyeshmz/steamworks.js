@@ -18,7 +18,7 @@ callback id, and a second registration replaces the first.
 
 ## The patch
 
-Only `src/lib.rs` and `src/server.rs` differ from upstream:
+The patch touches `src/lib.rs` and `src/server.rs`:
 
 - `Callbacks` gains `raw_call_results` and `raw_observer`.
 - `Client::set_raw_callback_observer` installs one observer that receives
@@ -29,7 +29,13 @@ Only `src/lib.rs` and `src/server.rs` differ from upstream:
 - When `GetAPICallResult` fails for a raw call, the handler receives an empty
   payload and `io failure = true` instead of being dropped.
 
-Nothing else changes, so the existing typed APIs behave as upstream.
+One upstream bug fix is backported:
+
+- `UGC::delete_item` read its call result as `DownloadItemResult_t`. That struct is larger
+  than the `DeleteItemResult_t` Steam returns, so the read went past the end of the payload.
+  Upstream fixed this after the pinned revision; `src/ugc.rs` now uses `DeleteItemResult_t`.
+
+Nothing else changes, so the existing typed APIs otherwise behave as upstream.
 
 ## Updating
 
