@@ -46,6 +46,10 @@ mod ffi {
             pMessages: *const *mut Msg,
             pOutMessageNumberOrResult: *mut i64,
         );
+        pub fn SteamAPI_ISteamInput_EnableActionEventCallbacks(
+            self_: *mut c_void,
+            pCallback: Option<unsafe extern "C" fn(*mut steamworks::sys::SteamInputActionEvent_t)>,
+        );
         pub fn SteamAPI_ISteamNetworkingUtils_SetConfigValue(
             self_: *mut c_void,
             eValue: i32,
@@ -276,4 +280,36 @@ pub unsafe fn SteamAPI_ISteamNetworkingUtils_SetConfigValue(
         }
     };
     super::js_bool(env, ok)
+}
+
+/// Pseudo callback id for SteamInputActionEvent_t; lib/sdk/runtime.js uses the same value.
+pub const INPUT_ACTION_EVENT_ID: i32 = -1;
+
+unsafe extern "C" fn on_input_action_event(event: *mut sys::SteamInputActionEvent_t) {
+    if event.is_null() {
+        return;
+    }
+    let size = std::mem::size_of::<sys::SteamInputActionEvent_t>();
+    let bytes = std::slice::from_raw_parts(event as *const u8, size).to_vec();
+    super::push_callback(Pipe::Client, INPUT_ACTION_EVENT_ID, bytes);
+}
+
+/// Args: `[enabled]`. JavaScript keeps the handler; Steam gets a native
+/// function that queues each event for the callback pump.
+pub unsafe fn SteamAPI_ISteamInput_EnableActionEventCallbacks(
+    env: &Env,
+    iface: *mut c_void,
+    _pipe: Pipe,
+    a: &Args,
+) -> Result<JsUnknown> {
+    let enabled = a.bool(0, "enabled")?;
+    ffi::SteamAPI_ISteamInput_EnableActionEventCallbacks(
+        iface,
+        if enabled {
+            Some(on_input_action_event)
+        } else {
+            None
+        },
+    );
+    super::js_undefined(env)
 }

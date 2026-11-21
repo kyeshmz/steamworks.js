@@ -2518,7 +2518,7 @@ pub unsafe fn call(env: &Env, method: u32, iface: *mut c_void, pipe: Pipe, a: &A
         516 => m516(env, iface, pipe, a),
         517 => m517(env, iface, pipe, a),
         518 => m518(env, iface, pipe, a),
-        519 => Err(unavailable("SteamAPI_ISteamInput_EnableActionEventCallbacks", "Takes a native function pointer that Steam calls from inside SteamInput.RunFrame().")),
+        519 => manual::SteamAPI_ISteamInput_EnableActionEventCallbacks(env, iface, pipe, a),
         520 => m520(env, iface, pipe, a),
         521 => m521(env, iface, pipe, a),
         522 => m522(env, iface, pipe, a),

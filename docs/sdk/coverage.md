@@ -7,9 +7,9 @@ This layer covers 999 flat API methods (interface and struct methods) from `Stea
 | Status | Methods | Meaning |
 |---|---|---|
 | Generated | 908 | Bound mechanically from steam_api.json and the bindgen types. |
-| Hand-written | 5 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
+| Hand-written | 6 | Bound in `src/sdk/manual.rs` because the parameters need custom marshalling. |
 | Not implemented yet | 17 | Expressible, but not written yet. |
-| Not available | 23 | Cannot be called safely from JavaScript, or the type is not in the public SDK. |
+| Not available | 22 | Cannot be called safely from JavaScript, or the type is not in the public SDK. |
 | Not exposed | 46 | Interfaces that only exist to be implemented by C++ code, or plumbing init() already handles. |
 
 Calling a method that is not available throws a `SteamSdkError` with the reason below.
@@ -18,6 +18,7 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 
 | Method | Reason |
 |---|---|
+| `ISteamInput.EnableActionEventCallbacks` | Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump. |
 | `ISteamNetworkingMessages.ReceiveMessagesOnChannel` | Returns copies of the received messages and releases the native ones. |
 | `ISteamNetworkingSockets.SendMessages` | Takes message descriptions and allocates the native messages itself. |
 | `ISteamNetworkingSockets.ReceiveMessagesOnConnection` | Returns copies of the received messages and releases the native ones. |
@@ -51,7 +52,6 @@ Calling a method that is not available throws a `SteamSdkError` with the reason 
 | Method | Reason |
 |---|---|
 | `ISteamUtils.SetWarningMessageHook` | pFunction: type SteamAPIWarningMessageHook_t |
-| `ISteamInput.EnableActionEventCallbacks` | Takes a native function pointer that Steam calls from inside SteamInput.RunFrame(). |
 | `ISteamNetworkingSockets.GetHostedDedicatedServerAddress` | pRouting: SteamDatagramHostedAddress is not defined in the public SDK headers shipped with steamworks-sys |
 | `ISteamNetworkingSockets.GetGameCoordinatorServerLogin` | pLoginInfo: SteamDatagramGameCoordinatorServerLogin is not defined in the public SDK headers shipped with steamworks-sys |
 | `ISteamNetworkingSockets.ConnectP2PCustomSignaling` | Requires a native ISteamNetworkingConnectionSignaling object implemented by the game. |

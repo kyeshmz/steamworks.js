@@ -22,7 +22,7 @@ Valve documentation: <https://partner.steamgames.com/doc/api/ISteamInput>
 | [BNewDataAvailable](#bnewdataavailable) | `boolean` | Generated |
 | [GetConnectedControllers](#getconnectedcontrollers) | `{ result: number; handlesOut: BigUint64Array }` | Generated |
 | [EnableDeviceCallbacks](#enabledevicecallbacks) | `void` | Generated |
-| [EnableActionEventCallbacks](#enableactioneventcallbacks) | — | Not available |
+| [EnableActionEventCallbacks](#enableactioneventcallbacks) | `void` | Hand-written |
 | [GetActionSetHandle](#getactionsethandle) | `bigint` | Generated |
 | [ActivateActionSet](#activateactionset) | `void` | Generated |
 | [GetCurrentActionSet](#getcurrentactionset) | `bigint` | Generated |
@@ -217,7 +217,11 @@ Valve: <https://partner.steamgames.com/doc/api/ISteamInput#EnableDeviceCallbacks
 
 ### EnableActionEventCallbacks
 
-**Not available:** Takes a native function pointer that Steam calls from inside SteamInput.RunFrame().
+```ts
+sdk.SteamInput.EnableActionEventCallbacks(pCallback: ((event: SteamInputActionEvent_t) => void) | null): void
+```
+
+Hand-written binding: Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump.
 
 ```cpp
 void EnableActionEventCallbacks( SteamInputActionEventCallbackPointer pCallback )

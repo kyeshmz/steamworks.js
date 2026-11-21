@@ -165,7 +165,7 @@ test('calls that need Steam fail cleanly before init()', () => {
 
 test('unavailable methods explain why', () => {
     throwsSdk(() => sdk.SteamMatchmakingServers.RequestLANServerList(480), /not available from JavaScript: Server browser/)
-    throwsSdk(() => sdk.SteamInput.EnableActionEventCallbacks(), /function pointer/)
+    throwsSdk(() => sdk.SteamNetworkingSockets.ConnectP2PCustomSignaling(), /ISteamNetworkingConnectionSignaling/)
     throwsSdk(() => sdk.SteamNetworkingUtils.AllocateMessage(16), /SendMessages allocates messages/)
 })
 
@@ -307,6 +307,24 @@ async function dispatchTests() {
             a.disconnect()
             b.disconnect()
             assert.deepEqual(seen, ['second'])
+        })
+
+        test('Steam Input action events reach the handler passed to EnableActionEventCallbacks', () => {
+            const calls = []
+            const saved = fake.sdkCall
+            fake.sdkCall = (index, accessor, args) => { calls.push(args) }
+            const seen = []
+            sdk.SteamInput.EnableActionEventCallbacks((event) => seen.push(event.eEventType))
+            const data = Buffer.from(new sdk.SteamInputActionEvent_t().buffer)
+            data[8] = 1 // eEventType follows the 8-byte controller handle
+            queue.push([0, 0, -1, null, false, data, []])
+            runtime.pump()
+            sdk.SteamInput.EnableActionEventCallbacks(null)
+            queue.push([0, 0, -1, null, false, data, []])
+            runtime.pump()
+            fake.sdkCall = saved
+            assert.deepEqual(calls, [[true], [false]])
+            assert.deepEqual(seen, [1])
         })
 
         await testAsync('reset rejects pending call results', async () => {

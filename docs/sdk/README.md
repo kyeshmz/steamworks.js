@@ -34,7 +34,7 @@ that this package links against, so it cannot drift from the binary.
 | [ISteamMusic](interfaces/ISteamMusic.md) | `SteamMusic` | 9 | 9/9 |
 | [ISteamMusicRemote](interfaces/ISteamMusicRemote.md) | `SteamMusicRemote` | 32 | 32/32 |
 | [ISteamHTTP](interfaces/ISteamHTTP.md) | `SteamHTTP`, `SteamGameServerHTTP` | 25 | 25/25 |
-| [ISteamInput](interfaces/ISteamInput.md) | `SteamInput` | 48 | 47/48 |
+| [ISteamInput](interfaces/ISteamInput.md) | `SteamInput` | 48 | 48/48 |
 | [ISteamController](interfaces/ISteamController.md) | `SteamController` | 34 | 34/34 |
 | [ISteamUGC](interfaces/ISteamUGC.md) | `SteamUGC`, `SteamGameServerUGC` | 94 | 94/94 |
 | [ISteamHTMLSurface](interfaces/ISteamHTMLSurface.md) | `SteamHTMLSurface` | 37 | 37/37 |
@@ -50,7 +50,7 @@ that this package links against, so it cannot drift from the binary.
 | [ISteamGameServerStats](interfaces/ISteamGameServerStats.md) | `SteamGameServerStats` | 10 | 10/10 |
 | [ISteamNetworkingFakeUDPPort](interfaces/ISteamNetworkingFakeUDPPort.md) | — | 4 | 3/4 |
 
-Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 23 not available, 17 not implemented yet, 5 hand-written.
+Totals across interfaces and struct methods: 999 methods; 46 not exposed, 908 generated, 22 not available, 17 not implemented yet, 6 hand-written.
 See [coverage](coverage.md) for every method that is not generated and why.
 
 - [Callbacks](callbacks.md): every callback and call result struct, with its id

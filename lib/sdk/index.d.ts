@@ -15560,14 +15560,14 @@ export interface ISteamInput {
      * for lower latency than standard Steam callbacks. Supports one callback at a time.
      * Note: this is called within either SteamInput()->RunFrame or by SteamAPI_RunCallbacks
      *
-     * **Not available from JavaScript:** Takes a native function pointer that Steam calls from inside SteamInput.RunFrame().
+     * Hand-written binding: Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump.
      *
      * @param pCallback `SteamInputActionEventCallbackPointer`
      * Steam posts `SteamInputGamepadSlotChange_t` when done; listen with `on('SteamInputGamepadSlotChange_t', ...)`.
      * C++: `void EnableActionEventCallbacks( SteamInputActionEventCallbackPointer pCallback )`
      * @see https://partner.steamgames.com/doc/api/ISteamInput#EnableActionEventCallbacks
      */
-    EnableActionEventCallbacks(...args: never[]): never
+    EnableActionEventCallbacks(pCallback: ((event: SteamInputActionEvent_t) => void) | null): void
     /**
      * Lookup the handle for an Action Set. Best to do this once on startup, and store the handles for all future API calls.
      *

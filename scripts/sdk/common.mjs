@@ -158,6 +158,10 @@ export const MANUAL_TS = {
         params: 'nMessages: number, pMessages: readonly SteamNetworkingMessageToSend[]',
         ret: '{ pOutMessageNumberOrResult: bigint[] }',
     },
+    SteamAPI_ISteamInput_EnableActionEventCallbacks: {
+        params: 'pCallback: ((event: SteamInputActionEvent_t) => void) | null',
+        ret: 'void',
+    },
     SteamAPI_ISteamNetworkingUtils_SetConfigValue: {
         params: 'eValue: ESteamNetworkingConfigValue, eScopeType: ESteamNetworkingConfigScope, scopeObj: bigint | number, eDataType: ESteamNetworkingConfigDataType, pArg: number | bigint | string',
         ret: 'boolean',

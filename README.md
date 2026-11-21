@@ -17,8 +17,8 @@ This fork has two APIs:
   other namespaces from upstream, plus the features listed in the [fork feature guide](docs/fork-features.md).
 - **1:1 SDK layer** (`client.sdk`): the whole Steamworks SDK under its C++ names, generated from
   Valve's `steam_api.json`.
-  - **Coverage:** every interface, struct, callback, enum and constant. 913 of the 953 methods
-    on exposed interfaces and structs are callable: 908 generated and 5 hand-written. The other
+  - **Coverage:** every interface, struct, callback, enum and constant. 914 of the 953 methods
+    on exposed interfaces and structs are callable: 908 generated and 6 hand-written. The other
     46 flat methods belong to `ISteamClient` and the C++ response interfaces, which are not
     exposed. The [coverage page](docs/sdk/coverage.md) gives the reason for each method that is
     not callable.

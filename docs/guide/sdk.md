@@ -273,9 +273,12 @@ reason. In short:
     itself.
   - **`SteamNetworkingUtils.SetConfigValue(...)`** takes the value as a number, bigint or
     string, according to `eDataType`.
+  - **`SteamInput.EnableActionEventCallbacks(handler)`** takes a function, or `null` to turn it
+    off, where C++ takes a function pointer. Steam calls a native function that queues each
+    `SteamInputActionEvent_t`, and your handler receives it on the next callback pump.
 - **Not available.** Methods that take native function pointers or C++ objects you would
-  implement (custom signaling, the global networking callbacks, `EnableActionEventCallbacks`),
-  or that return raw native objects. Most have an equivalent through `sdk.on(...)`, and the
+  implement (custom signaling, the global networking callbacks), or that return raw native
+  objects. Most have an equivalent through `sdk.on(...)`, and the
   reason text says which.
 - **Not implemented yet.** `ISteamMatchmakingServers` (the server browser), which reports
   results through C++ response objects.

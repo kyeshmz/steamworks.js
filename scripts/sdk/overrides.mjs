@@ -272,12 +272,12 @@ export const manualMethods = {
     SteamAPI_ISteamNetworkingSockets_ReceiveMessagesOnPollGroup: 'Returns copies of the received messages and releases the native ones.',
     SteamAPI_ISteamNetworkingSockets_SendMessages: 'Takes message descriptions and allocates the native messages itself.',
     SteamAPI_ISteamNetworkingUtils_SetConfigValue: 'pArg points to an int32, int64, float, string or pointer depending on eDataType.',
+    SteamAPI_ISteamInput_EnableActionEventCallbacks: 'Takes a JavaScript handler instead of a function pointer; events are queued natively and delivered by the callback pump.',
 }
 
 // Methods that cannot be expressed from JavaScript, with the reason.
 export const unsupportedMethods = {
     SteamAPI_ISteamNetworkingUtils_AllocateMessage: 'Returns a native message JavaScript cannot own. SteamNetworkingSockets.SendMessages allocates messages from the payloads you pass it.',
-    SteamAPI_ISteamInput_EnableActionEventCallbacks: 'Takes a native function pointer that Steam calls from inside SteamInput.RunFrame().',
     SteamAPI_ISteamNetworkingSockets_ConnectP2PCustomSignaling: 'Requires a native ISteamNetworkingConnectionSignaling object implemented by the game.',
     SteamAPI_ISteamNetworkingSockets_ReceivedP2PCustomSignal: 'Requires a native ISteamNetworkingSignalingRecvContext object implemented by the game.',
     SteamAPI_ISteamNetworkingSockets_CreateFakeUDPPort: 'Returns a native ISteamNetworkingFakeUDPPort object.',

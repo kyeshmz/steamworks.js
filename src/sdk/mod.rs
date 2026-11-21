@@ -101,6 +101,17 @@ fn observe(pipe: Pipe, id: i32, data: *const c_void, size: usize) {
     });
 }
 
+/// Queue an event that did not come through the callback dispatcher (for
+/// example SteamInputActionEvent_t, which Steam passes to a function pointer).
+pub(crate) fn push_callback(pipe: Pipe, id: i32, data: Vec<u8>) {
+    EVENTS.lock().unwrap().push(Event::Callback {
+        pipe,
+        id,
+        data,
+        extras: Vec::new(),
+    });
+}
+
 /// Called by `init()` once the client exists.
 pub(crate) fn attach_client(client: &steamworks::Client) {
     EVENTS.lock().unwrap().clear();
